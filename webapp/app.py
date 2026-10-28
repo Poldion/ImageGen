@@ -39,6 +39,9 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Upload
 from fastapi.responses import FileResponse, JSONResponse, Response
 from starlette.background import BackgroundTask
 from starlette.datastructures import UploadFile as StarletteUpload
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+import i18n
 
 COMFY = os.environ.get("COMFYUI_URL", "http://comfyui:8188").rstrip("/")
 from version import VERSION  # noqa: E402
@@ -54,6 +57,7 @@ SESSION_DAYS = int(os.environ.get("WEBAPP_SESSION_DAYS", "30"))
 TRUSTED_PROXIES = [ipaddress.ip_network(n.strip(), strict=False) for n in os.environ.get(
     "WEBAPP_TRUSTED_PROXIES", "127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1/128").split(",") if n.strip()]
 COOKIE = "imagegen_session"
+LANG_HEADER = "x-imagegen-lang"     # Sprache der Oberflaeche fuer Server-Meldungen (sonst Accept-Language)
 STATIC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 UPLOAD_SUBFOLDER = "webapp"
 MAX_UPLOAD = 30 * 1024 * 1024
@@ -238,6 +242,17 @@ async def lifespan(_app):
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
 
 
+def ui_lang(request: Request) -> str:
+    return i18n.request_lang(request.headers, LANG_HEADER)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_error(request: Request, exc: StarletteHTTPException):
+    # Meldungen entstehen auf Deutsch; Englisch, wenn die Oberflaeche (Kopfzeile) oder der Client es wuenscht
+    return JSONResponse({"detail": i18n.translate(exc.detail, ui_lang(request))}, status_code=exc.status_code,
+                        headers=getattr(exc, "headers", None))
+
+
 def _trusted(ip: str) -> bool:
     try:
         addr = ipaddress.ip_address(ip)
@@ -280,13 +295,14 @@ async def guard(request: Request, call_next):
     if request.method in ("POST", "PUT", "PATCH", "DELETE"):
         origin = request.headers.get("origin")
         if origin and urlsplit(origin).netloc.lower() != _host(request):
-            return JSONResponse({"detail": "Anfrage von fremder Seite abgelehnt"}, status_code=403)
+            return JSONResponse({"detail": i18n.translate("Anfrage von fremder Seite abgelehnt", ui_lang(request))},
+                                status_code=403)
     try:
         resp = await call_next(request)
     except httpx.HTTPError:
         # ComfyUI nicht erreichbar / Zeitueberschreitung -> verstaendliche Meldung statt 500
-        resp = JSONResponse({"detail": "ComfyUI ist gerade nicht erreichbar. Bitte gleich nochmal versuchen."},
-                            status_code=503)
+        resp = JSONResponse({"detail": i18n.translate("ComfyUI ist gerade nicht erreichbar. Bitte gleich nochmal versuchen.",
+                                                      ui_lang(request))}, status_code=503)
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
     resp.headers.setdefault("X-Frame-Options", "DENY")
     resp.headers.setdefault("Referrer-Policy", "same-origin")
@@ -798,8 +814,8 @@ def expand_prompts(template: str, variables: dict[str, list[str]], count: int,
             elif node[0] == "var":
                 name = node[1]
                 if name in stack:
-                    raise HTTPException(400, f"Variable [{name}] verweist auf sich selbst "
-                                             f"({' -> '.join(stack + [name])})")
+                    chain = " -> ".join(stack + [name])
+                    raise HTTPException(400, f"Variable [{name}] verweist auf sich selbst ({chain})")
                 if name not in picked:          # gleiche Variable im selben Bild = gleicher Wert
                     opts = values[name]
                     picked[name] = render(opts[deck("var:" + name, len(opts)).draw()], picked, stack + [name])
@@ -930,8 +946,7 @@ async def generate(workflow: str = Form(...), prompt: str = Form(...), variables
     with closing(db()) as con:
         active = con.execute("SELECT COUNT(*) FROM jobs WHERE user_id = ? AND done = 0", (user["id"],)).fetchone()[0]
     if active + total > MAX_ACTIVE_JOBS:
-        raise HTTPException(429, f"Zu viele Aufträge: {active} laufen noch, höchstens {MAX_ACTIVE_JOBS} gleichzeitig"
-                                 " - bitte warten oder weniger Bilder")
+        raise HTTPException(429, f"Zu viele Aufträge: {active} laufen noch, höchstens {MAX_ACTIVE_JOBS} gleichzeitig - bitte warten oder weniger Bilder")
     with open(os.path.join(WORKFLOWS, entry["file"] + ".json"), encoding="utf-8") as f:
         base = json.load(f)
     if "width" in fields and width and height:
@@ -1512,16 +1527,18 @@ def need_module(request: Request):
 
 
 @app.get("/proxy-module")
-async def proxy_module(_=Depends(need_module)):
-    links = [{"label": "ImageGen öffnen", "path": "/"}]
+async def proxy_module(request: Request, _=Depends(need_module)):
+    lang = i18n.request_lang(request.headers, LANG_HEADER)
+    links = [{"label": i18n.tr("ImageGen öffnen", lang), "path": "/"}]
     if COMFYUI_LINK_PORT:
-        links.append({"label": "ComfyUI öffnen", "port": COMFYUI_LINK_PORT})
+        links.append({"label": i18n.tr("ComfyUI öffnen", lang), "port": COMFYUI_LINK_PORT})
     return {"name": "ImageGen", "version": VERSION, "links": links, "capabilities": ["memory", "free"],
             "idle_free_minutes": MODULE_IDLE_FREE_MINUTES}
 
 
 @app.get("/proxy-module/memory")
-async def proxy_module_memory(_=Depends(need_module)):
+async def proxy_module_memory(request: Request, _=Depends(need_module)):
+    lang = i18n.request_lang(request.headers, LANG_HEADER)
     out = {"rss": None, "gpu": 0, "held": 0, "reclaimable": False, "busy": False, "detail": None}
     try:
         r = await client.get(f"{COMFY}/proxy/memory", timeout=3)
@@ -1531,7 +1548,8 @@ async def proxy_module_memory(_=Depends(need_module)):
             out.update(rss=rss, gpu=gpu, busy=bool(p.get("busy")),
                        reclaimable=(n or 0) > 0 or gpu >= COMFY_MIN_HELD or rss > COMFY_BASE_RSS)
             if n:
-                out["detail"] = f"ComfyUI: {n} Modell{'e' if n != 1 else ''} im Cache"
+                out["detail"] = (i18n.tr("ComfyUI: {n} Modell im Cache", lang, n=n) if n == 1
+                                 else i18n.tr("ComfyUI: {n} Modelle im Cache", lang, n=n))
             out["held"] = rss + gpu if out["reclaimable"] else 0
         else:
             d = (await client.get(f"{COMFY}/system_stats", timeout=3)).json()
@@ -1540,7 +1558,7 @@ async def proxy_module_memory(_=Depends(need_module)):
             out.update(gpu=gpu, held=gpu, reclaimable=gpu >= COMFY_MIN_HELD,
                        busy=bool(q.get("queue_running") or q.get("queue_pending")))
     except (httpx.HTTPError, ValueError):
-        out["detail"] = "ComfyUI nicht erreichbar"
+        out["detail"] = i18n.tr("ComfyUI nicht erreichbar", lang)
     return out
 
 
@@ -1777,8 +1795,9 @@ async def admin_page(request: Request):
 
 
 @app.get("/manifest.webmanifest")
-async def manifest():
-    return JSONResponse({"name": "Bilder", "short_name": "Bilder", "start_url": "/", "display": "standalone",
+async def manifest(request: Request):
+    name = i18n.tr("Bilder", i18n.request_lang(request.headers, LANG_HEADER))
+    return JSONResponse({"name": name, "short_name": name, "start_url": "/", "display": "standalone",
                          "background_color": "#111214", "theme_color": "#111214",
                          "icons": [{"src": "/icon.svg", "sizes": "any", "type": "image/svg+xml"}]},
                         media_type="application/manifest+json")
@@ -1787,6 +1806,12 @@ async def manifest():
 @app.get("/icon.svg")
 async def icon():
     return FileResponse(os.path.join(STATIC, "icon.svg"), media_type="image/svg+xml")
+
+
+@app.get("/i18n.js")
+async def i18n_js():
+    return Response(i18n.script("imagegen.lang", "X-ImageGen-Lang"), media_type="text/javascript; charset=utf-8",
+                    headers={"Cache-Control": "no-cache"})
 
 
 @app.get("/{name}.{ext}")

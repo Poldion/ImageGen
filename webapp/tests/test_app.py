@@ -172,6 +172,27 @@ def test_pages_and_static(tc):
     assert a.get("/manifest.webmanifest").json()["name"] == "Bilder"
 
 
+def test_i18n_script_and_translated_errors(tc):
+    a = setup_admin(tc)
+    js = a.get("/i18n.js")
+    assert js.status_code == 200 and "window.I18N" in js.text and '"Meine Bilder": "My images"' in js.text
+    assert generate(a, workflow="gibtsnicht").json()["detail"] == "Workflow unbekannt"
+    en = {"X-ImageGen-Lang": "en"}
+    r = a.post("/api/generate", data={"workflow": "gibtsnicht", "prompt": "a cat"}, headers=en)
+    assert r.json()["detail"] == "Unknown workflow"
+    r = a.post("/api/generate", data={"workflow": "anime_anima", "prompt": "x" * 4001}, headers=en)
+    assert r.json()["detail"] == "Prompt (max. 4000) or variables (max. 60000 characters) too long"
+    r = As(tc).get("/manifest.webmanifest", headers={"Accept-Language": "en-GB,en"})
+    assert r.json()["name"] == "Images"
+
+
+def test_all_texts_translated():
+    import subprocess
+    out = subprocess.run([sys.executable, os.path.join(HERE, "..", "scripts", "check_i18n.py")],
+                         capture_output=True, text=True)
+    assert out.returncode == 0, out.stderr
+
+
 def test_security_headers(tc):
     r = As(tc).get("/")
     assert r.headers["x-frame-options"] == "DENY"

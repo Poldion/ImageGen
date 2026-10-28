@@ -8,6 +8,7 @@
 <link rel="icon" href="/icon.svg">
 <link rel="apple-touch-icon" href="/icon.svg">
 <link rel="stylesheet" href="/common.css">
+<script src="/i18n.js"></script>
 <title>Bilder</title>
 <style>
   .wrap { max-width:720px; margin:0 auto; padding:14px 16px calc(90px + env(safe-area-inset-bottom)); }
@@ -121,6 +122,7 @@
       <button class="link" id="api-keys">API</button>
       <button class="link" id="pw-change">Passwort</button>
       <button class="link" id="logout">Abmelden</button>
+      <span id="lang"></span>
     </nav>
   </header>
 
@@ -165,8 +167,8 @@
       <div class="vars-in">
         <label class="l" for="vars">Variablen (eine pro Zeile)</label>
         <textarea id="vars" rows="3" maxlength="60000" spellcheck="false"
-                  placeholder="haar = red hair | blue hair | silver hair | grey hair&#10;ort = forest | beach | tavern"></textarea>
-        <div class="hint">Im Prompt mit <code>[haar]</code> einsetzen. Geht auch direkt im Prompt:
+                  placeholder="hair = red hair | blue hair | silver hair | grey hair&#10;place = forest | beach | tavern"></textarea>
+        <div class="hint">Im Prompt mit <code>[hair]</code> einsetzen. Geht auch direkt im Prompt:
           <code>[red|blue|green]</code>. Gewürfelt wird vor dem Senden – das Modell bekommt nur den fertigen Prompt.</div>
         <div class="vars-row">
           <label class="l" style="margin:0">Anzahl Bilder</label>
@@ -252,17 +254,19 @@
 <script src="/ui.js"></script>
 <script>
 const $ = id => document.getElementById(id);
+i18nApply();
+$('lang').replaceWith(langSwitch('link'));
 const SIZES = [
   {name:'Quadrat', w:1024, h:1024}, {name:'Quer', w:1344, h:768}, {name:'Hoch', w:768, h:1344},
   {name:'Quer 3:2', w:1216, h:832}, {name:'Hoch 2:3', w:832, h:1216},
 ];
 const PLACEHOLDER = {
-  generate: 'Beschreibe das Bild, z.B. "A tiefling bard with curled horns plays a lute in a crowded tavern at night."',
-  edit: 'Was soll sich ändern? z.B. "Change the background to a snowy mountain village. Keep everything else unchanged."',
-  video: 'Szene und Bewegung beschreiben, z.B. "A woman walks along a beach at sunset, waves roll in, slow camera pan."',
-  video_edit: 'Was soll passieren? z.B. "She turns her head and smiles, her hair moves in the wind, camera slowly zooms in."',
+  generate: tr('Beschreibe das Bild, z. B. "A tiefling bard with curled horns plays a lute in a crowded tavern at night."'),
+  edit: tr('Was soll sich ändern? z. B. "Change the background to a snowy mountain village. Keep everything else unchanged."'),
+  video: tr('Szene und Bewegung beschreiben, z. B. "A woman walks along a beach at sunset, waves roll in, slow camera pan."'),
+  video_edit: tr('Was soll passieren? z. B. "She turns her head and smiles, her hair moves in the wind, camera slowly zooms in."'),
 };
-const IMG_EMPTY = '<b>Bilder auswählen</b>Tippen zum Hochladen (auch mehrere), oder bei eigenen Bildern „Bearbeiten“';
+const IMG_EMPTY = '<b>' + tr('Bilder auswählen') + '</b>' + tr('Tippen zum Hochladen (auch mehrere), oder bei eigenen Bildern „Bearbeiten“');
 const MAX_INPUTS = 100;
 const store = {
   get(k, d) { try { const v = localStorage.getItem('ig.' + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
@@ -276,9 +280,9 @@ let pollTimer = null;
 
 async function api(path, opts) {
   const r = await fetch(path, opts);
-  if (r.status === 401) { location.replace('/?t=' + Date.now()); throw new Error('abgemeldet'); }
+  if (r.status === 401) { location.replace('/?t=' + Date.now()); throw new Error(tr('abgemeldet')); }
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.detail || j.error || ('Fehler ' + r.status));
+  if (!r.ok) throw new Error(j.detail || j.error || tr('Fehler {status}', {status: r.status}));
   return j;
 }
 // v = Version (Erstellzeit/Auftrag): neues Bild unter altem Namen -> neue Adresse, kein alter Cache
@@ -286,7 +290,7 @@ const imgUrl = (i, preview) => `/api/image?filename=${encodeURIComponent(i.filen
   `${i.v || i.created ? '&v=' + encodeURIComponent(i.v || i.created) : ''}${preview ? '&preview=1' : ''}`;
 const refOf = i => (i.subfolder ? i.subfolder + '/' : '') + i.filename;
 const key = i => (i.subfolder || '') + '/' + i.filename;
-const fmtDate = t => new Date(t * 1000).toLocaleString('de-DE', {dateStyle: 'short', timeStyle: 'short'});
+const fmtDate = t => new Date(t * 1000).toLocaleString(LOCALE, {dateStyle: 'short', timeStyle: 'short'});
 
 // ---------------------------------------------------------------- Formular
 // Tab eines Workflows: D&D hat einen eigenen (Erzeugen und "aus Bild" gemischt), sonst nach Modus
@@ -304,7 +308,7 @@ function setMode(m) {
   const seen = new Set(), opts = [];
   for (const w of list) {
     const k = wfKey(w);
-    if (!seen.has(k)) { seen.add(k); opts.push(new Option(w.group || w.title, k)); }
+    if (!seen.has(k)) { seen.add(k); opts.push(new Option(tr(w.group || w.title), k)); }
   }
   $('wf').replaceChildren(...opts);
   const saved = store.get('wf.' + m);
@@ -333,7 +337,7 @@ function renderArts() {
   const w = current();
   const vs = w && w.group ? workflows.filter(x => x.group === w.group && tabOf(x) === mode) : [];
   $('art-row').style.display = vs.length > 1 ? '' : 'none';
-  $('arts').innerHTML = vs.map(v => `<button class="chip ${v.file === curFile ? 'on' : ''}" data-f="${v.file}">${v.variant}</button>`).join('');
+  $('arts').innerHTML = vs.map(v => `<button class="chip ${v.file === curFile ? 'on' : ''}" data-f="${v.file}">${tr(v.variant)}</button>`).join('');
   $('arts').querySelectorAll('.chip').forEach(b => b.onclick = () => selectFile(b.dataset.f));
 }
 function onWorkflow() {
@@ -342,20 +346,20 @@ function onWorkflow() {
   const video = w.kind === 'video';
   $('img-row').style.display = w.mode === 'edit' ? '' : 'none';
   $('prompt').placeholder = PLACEHOLDER[video ? (w.mode === 'edit' ? 'video_edit' : 'video') : w.mode];
-  $('prompt-label').textContent = video ? 'Bewegung & Szene' : w.mode === 'edit' ? 'Anweisung' : 'Prompt';
+  $('prompt-label').textContent = video ? tr('Bewegung & Szene') : w.mode === 'edit' ? tr('Anweisung') : tr('Prompt');
   updateBatchUi();
   $('enh').style.display = w.enhance ? '' : 'none';
-  $('wf-hint').textContent = `${w.summary} · ca. ${w.seconds >= 90 ? Math.round(w.seconds / 60) + ' min' : w.seconds + ' s'}` +
-    (w.kind === 'video' ? ' pro Video' : '');
+  $('wf-hint').textContent = tr(w.summary) + ' · ' + tr('ca. {time}', {time: w.seconds >= 90 ? Math.round(w.seconds / 60) + ' min' : w.seconds + ' s'}) +
+    (w.kind === 'video' ? tr(' pro Video') : '');
   const hasSize = !!w.default_size;
   $('sizes').style.display = hasSize ? '' : 'none';
   $('size-hint').style.display = hasSize ? 'none' : '';
   // ohne Groessenwahl: Bearbeiten richtet sich nach dem Bild, Erzeugen (z.B. Token) hat eine feste Groesse
-  $('size-hint').textContent = w.mode === 'edit' && !(w.variant || '').startsWith('Token') ? 'Die Größe folgt dem Eingabebild.' : 'Feste Größe (quadratisch, 1024 × 1024).';
-  if (w.default_prompt) $('prompt').placeholder = 'Optional: Wünsche, z.B. grimmiger Blick, trägt eine Kapuze';
+  $('size-hint').textContent = w.mode === 'edit' && !(w.variant || '').startsWith('Token') ? tr('Die Größe folgt dem Eingabebild.') : tr('Feste Größe (quadratisch, 1024 × 1024).');
+  if (w.default_prompt) $('prompt').placeholder = tr('Optional: Wünsche, z. B. grimmiger Blick, trägt eine Kapuze');
   if (hasSize) {
     curSizes = (w.sizes ? w.sizes.map(([name, sw, sh]) => ({name, w: sw, h: sh})) : SIZES.slice());
-    if (w.auto_size) curSizes.unshift({name: 'Wie Bild', auto: true});
+    if (w.auto_size) curSizes.unshift({name: 'Wie Bild', auto: true});   // Name wird beim Anzeigen übersetzt
     const saved = store.get('size.' + w.file);
     const def = curSizes.find(s => s.auto) || curSizes.find(s => s.w === w.default_size[0] && s.h === w.default_size[1]) || curSizes[0];
     size = curSizes.find(s => saved && (saved === 'auto' ? s.auto : s.w === saved[0] && s.h === saved[1])) || def;
@@ -384,23 +388,23 @@ function onWorkflow() {
 let curSizes = SIZES.slice(), dur = 5, mot = 3, act = 1;
 function renderActs() {
   const w = current();
-  $('acts').innerHTML = w.action.labels.map((l, i) => `<button class="chip ${i + 1 === act ? 'on' : ''}" data-a="${i + 1}">${l}</button>`).join('');
+  $('acts').innerHTML = w.action.labels.map((l, i) => `<button class="chip ${i + 1 === act ? 'on' : ''}" data-a="${i + 1}">${tr(l)}</button>`).join('');
   $('acts').querySelectorAll('.chip').forEach(b => b.onclick = () => { act = +b.dataset.a; store.set('act.' + w.file, act); renderActs(); });
-  $('act-hint').textContent = (w.action.hints[act - 1] || '') +
-    (act > 1 && w.file === 'video_wan22_i2v' ? ' · Wirkt mit „Dynamisch“ deutlich besser (der Schnellmodus dämpft es).' : '');
+  $('act-hint').textContent = tr(w.action.hints[act - 1] || '') +
+    (act > 1 && w.file === 'video_wan22_i2v' ? tr(' · Wirkt mit „Dynamisch“ deutlich besser (der Schnellmodus dämpft es).') : '');
 }
 function renderMots() {
   const w = current();
-  $('mots').innerHTML = w.motion.labels.map((l, i) => `<button class="chip ${i + 1 === mot ? 'on' : ''}" data-m="${i + 1}">${l}</button>`).join('');
+  $('mots').innerHTML = w.motion.labels.map((l, i) => `<button class="chip ${i + 1 === mot ? 'on' : ''}" data-m="${i + 1}">${tr(l)}</button>`).join('');
   $('mots').querySelectorAll('.chip').forEach(b => b.onclick = () => { mot = +b.dataset.m; store.set('mot.' + w.file, mot); renderMots(); });
-  $('mot-hint').textContent = (w.motion.hints[mot - 1] || '') +
-    (w.mode === 'edit' ? ' · Bei Video aus Bild zählt vor allem die Handlung, die du beschreibst.' : '');
+  $('mot-hint').textContent = tr(w.motion.hints[mot - 1] || '') +
+    (w.mode === 'edit' ? tr(' · Bei Video aus Bild zählt vor allem die Handlung, die du beschreibst.') : '');
 }
 function renderSizes() {
   $('sizes').innerHTML = curSizes.map((s, i) => {
     const k = 14 / Math.max(s.w || 1, s.h || 1);
     const icon = s.auto ? '' : `<i style="width:${Math.round(s.w * k)}px;height:${Math.round(s.h * k)}px"></i>`;
-    return `<button class="chip ${s === size ? 'on' : ''}" data-i="${i}">${icon}${s.name}</button>`;
+    return `<button class="chip ${s === size ? 'on' : ''}" data-i="${i}">${icon}${tr(s.name)}</button>`;
   }).join('');
   $('sizes').querySelectorAll('.chip').forEach(b => b.onclick = () => {
     size = curSizes[+b.dataset.i]; store.set('size.' + current().file, size.auto ? 'auto' : [size.w, size.h]); renderSizes();
@@ -414,11 +418,11 @@ function renderDurs() {
 let enhPrev = null;
 async function enhancePrompt() {
   const w = current(), text = $('prompt').value.trim();
-  if (!w || !text) { toast('Erst eine kurze Idee eingeben', true); $('prompt').focus(); return; }
+  if (!w || !text) { toast(tr('Erst eine kurze Idee eingeben'), true); $('prompt').focus(); return; }
   const fd = new FormData();
   fd.append('workflow', w.file); fd.append('prompt', text);
   if (w.mode === 'edit' && inputs.length) inputs[0].file ? fd.append('image', inputs[0].file) : fd.append('source', inputs[0].source);
-  const b = $('enh'); b.disabled = true; b.textContent = '✨ Formuliere …';
+  const b = $('enh'); b.disabled = true; b.textContent = tr('✨ Formuliere …');
   try {
     const r = await api('/api/enhance', {method:'POST', body:fd});
     enhPrev = $('prompt').value;
@@ -426,7 +430,7 @@ async function enhancePrompt() {
     $('enh-undo').style.display = '';
     if (r.warning) toast(r.warning, true);
   } catch (e) { toast(e.message, true); }
-  finally { b.disabled = false; b.textContent = '✨ Ausformulieren'; }
+  finally { b.disabled = false; b.textContent = tr('✨ Ausformulieren'); }
 }
 function updateCount() { const n = $('prompt').value.length; $('pcount').textContent = n > 3000 ? `${n}/4000` : ''; }
 
@@ -436,28 +440,28 @@ function setInputs(list) {
   inputs = list.slice(0, MAX_INPUTS);
   $('thumbs').replaceChildren(...inputs.map((inp, idx) => {
     const d = document.createElement('div'); d.className = 'th';
-    d.innerHTML = '<img alt=""><button class="rm" aria-label="entfernen">✕</button>';
+    d.innerHTML = '<img alt=""><button class="rm" aria-label="' + tr('entfernen') + '">✕</button>';
     d.querySelector('img').src = inp.url;
-    d.querySelector('img').title = inp.file ? inp.file.name : 'Eigenes Bild';
+    d.querySelector('img').title = inp.file ? inp.file.name : tr('Eigenes Bild');
     d.querySelector('.rm').onclick = e => { e.stopPropagation(); setInputs(inputs.filter((_, k) => k !== idx)); };
     return d;
   }));
   $('img-clear').style.display = inputs.length > 1 ? '' : 'none';
   if (!inputs.length) $('img-text').innerHTML = IMG_EMPTY;
   else if (inputs.length === 1) {
-    $('img-text').innerHTML = '<b></b>Tippen für weitere Bilder';
-    $('img-text').querySelector('b').textContent = inputs[0].file ? inputs[0].file.name : 'Eigenes Bild';
-  } else $('img-text').innerHTML = `<b>${inputs.length} Bilder</b>Jedes wird mit demselben Prompt bearbeitet · tippen für weitere`;
+    $('img-text').innerHTML = '<b></b>' + tr('Tippen für weitere Bilder');
+    $('img-text').querySelector('b').textContent = inputs[0].file ? inputs[0].file.name : tr('Eigenes Bild');
+  } else $('img-text').innerHTML = '<b>' + tr('{n} Bilder', {n: inputs.length}) + '</b>' + tr('Jedes wird mit demselben Prompt bearbeitet · tippen für weitere');
   updateBatchUi();
 }
 function addFiles(fileList) {
   const add = [];
   for (const f of fileList) {
-    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { toast(`Nur PNG, JPG oder WebP: ${f.name}`, true); continue; }
-    if (f.size > 30 * 1024 * 1024) { toast(`Zu groß (max. 30 MB): ${f.name}`, true); continue; }
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { toast(tr('Nur PNG, JPG oder WebP: {name}', {name: f.name}), true); continue; }
+    if (f.size > 30 * 1024 * 1024) { toast(tr('Zu groß (max. 30 MB): {name}', {name: f.name}), true); continue; }
     add.push({file: f, url: URL.createObjectURL(f)});
   }
-  if (inputs.length + add.length > MAX_INPUTS) toast(`Höchstens ${MAX_INPUTS} Bilder auf einmal`, true);
+  if (inputs.length + add.length > MAX_INPUTS) toast(tr('Höchstens {n} Bilder auf einmal', {n: MAX_INPUTS}), true);
   setInputs(inputs.concat(add));
 }
 function useAsInput(imgs) {
@@ -490,25 +494,25 @@ function updateBatchUi() {
   if (document.activeElement !== $('cnt')) $('cnt').value = count;
   const nVars = $('vars').value.split('\n').filter(l => l.trim() && !l.trim().startsWith('#')).length;
   const parts = [];
-  if (count > 1) parts.push(`${count} Bilder`);
-  if (nVars) parts.push(nVars === 1 ? '1 Variable' : `${nVars} Variablen`);
+  if (count > 1) parts.push(tr('{n} Bilder', {n: count}));
+  if (nVars) parts.push(nVars === 1 ? tr('1 Variable') : tr('{n} Variablen', {n: nVars}));
   $('vars-badge').textContent = parts.length ? '· ' + parts.join(', ') : '';
   const wv = current(), video = wv && wv.kind === 'video', edit = wv && wv.mode === 'edit';
   const total = (edit ? Math.max(1, inputs.length) : 1) * count;
-  $('go').textContent = video ? (total > 1 ? `${total} Videos erzeugen` : 'Video erzeugen')
-    : edit ? (total > 1 ? `${total} Bilder bearbeiten` : 'Los') : (count > 1 ? `${count} Bilder erzeugen` : 'Erzeugen');
+  $('go').textContent = video ? (total > 1 ? tr('{n} Videos erzeugen', {n: total}) : tr('Video erzeugen'))
+    : edit ? (total > 1 ? tr('{n} Bilder bearbeiten', {n: total}) : tr('Los')) : (count > 1 ? tr('{n} Bilder erzeugen', {n: count}) : tr('Erzeugen'));
 }
 const MAX_COUNT = 1000;   // nur Schutz gegen Tippfehler (Server: WEBAPP_MAX_BATCH)
 function setCount(n) { count = Math.max(1, Math.min(MAX_COUNT, Math.floor(+n) || 1)); updateBatchUi(); }
 async function preview() {
   const prompt = $('prompt').value.trim();
-  if (!prompt) { $('preview').innerHTML = '<li class="warn">Erst einen Prompt eingeben.</li>'; return; }
+  if (!prompt) { $('preview').innerHTML = '<li class="warn">' + tr('Erst einen Prompt eingeben.') + '</li>'; return; }
   try {
     const r = await api('/api/expand', {method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({prompt, variables: $('vars').value, count: Math.max(count, 3)})});
     $('preview').replaceChildren(
       ...r.unknown.map(u => Object.assign(document.createElement('li'), {className: 'warn',
-        textContent: `[${u}] ist keine Variable und bleibt als Text stehen.`})),
+        textContent: tr('[{name}] ist keine Variable und bleibt als Text stehen.', {name: u})})),
       ...r.prompts.map(p => Object.assign(document.createElement('li'), {textContent: p})));
   } catch (e) { $('preview').innerHTML = ''; $('preview').append(Object.assign(document.createElement('li'), {className: 'warn', textContent: e.message})); }
 }
@@ -527,8 +531,8 @@ async function run() {
   const w = current();
   const prompt = $('prompt').value.trim() || (w && w.default_prompt) || '';
   if (!w || $('go').disabled) return;
-  if (!prompt) { status('Bitte einen Prompt eingeben.', null, true); return; }
-  if (w.mode === 'edit' && !inputs.length) { status('Bitte ein Eingabebild wählen.', null, true); return; }
+  if (!prompt) { status(tr('Bitte einen Prompt eingeben.'), null, true); return; }
+  if (w.mode === 'edit' && !inputs.length) { status(tr('Bitte ein Eingabebild wählen.'), null, true); return; }
   const fd = new FormData();
   fd.append('workflow', w.file); fd.append('prompt', prompt);
   fd.append('variables', $('vars').value); fd.append('count', count);
@@ -539,7 +543,7 @@ async function run() {
   if (w.mode === 'edit') inputs.forEach(i => i.file ? fd.append('image', i.file) : fd.append('source', i.source));
   busy(true);
   const nUp = w.mode === 'edit' ? inputs.filter(i => i.file).length : 0;
-  status(nUp ? (nUp > 1 ? `${nUp} Bilder werden hochgeladen …` : 'Bild wird hochgeladen …') : 'Wird gestartet …', 0);
+  status(nUp ? (nUp > 1 ? tr('{n} Bilder werden hochgeladen …', {n: nUp}) : tr('Bild wird hochgeladen …')) : tr('Wird gestartet …'), 0);
   try {
     const r = await api('/api/generate', {method:'POST', body:fd});
     if (r.warning) toast(r.warning, true);
@@ -580,7 +584,7 @@ function pollBatch(b) {
     } catch (e) {
       // kurze Netz-/Serverausfaelle (Handy im Funkloch, Neustart) aussitzen
       netErrors++;
-      status(`Verbindung unterbrochen, versuche es weiter … (${e.message})`, null, true);
+      status(tr('Verbindung unterbrochen, versuche es weiter … ({error})', {error: e.message}), null, true);
       pollTimer = setTimeout(tick, Math.min(15000, 1000 * 2 ** Math.min(netErrors, 4)));
       return;
     }
@@ -588,7 +592,7 @@ function pollBatch(b) {
     let current = null;
     for (const id of open) {
       const j = st[id];
-      if (!j) { b.res[id] = {state: 'lost', error: 'Auftrag unbekannt'}; finished(b, id, b.res[id]); continue; }
+      if (!j) { b.res[id] = {state: 'lost', error: tr('Auftrag unbekannt')}; finished(b, id, b.res[id]); continue; }
       if (['done', 'error', 'lost', 'cancelled'].includes(j.state)) { b.res[id] = j; finished(b, id, j); }
       else if (!current || j.state === 'running') current = j;
     }
@@ -598,10 +602,11 @@ function pollBatch(b) {
     const per = b.durations.length ? b.durations.reduce((x, y) => x + y) / b.durations.length : ((current && current.seconds) || b.est);
     const part = current && current.state === 'running' ? Math.min(0.97, current.elapsed / per) : 0;
     const rest = Math.max(0, (n - done - part) * per);
-    const pre = n > 1 ? `Bild ${done + 1} von ${n}` + (n - done > 1 ? ` (noch ca. ${fmtDur(rest)})` : '') + ': ' : '';
-    if (!current || current.state === 'queued') status(pre + (current && current.ahead ? `in der Warteschlange (${current.ahead} davor) …` : 'wartet auf den Start …'), done / n);
-    else status(pre + (current.elapsed < per ? `läuft … ${Math.round(current.elapsed)} s` + (n === 1 ? ` (noch ca. ${Math.max(0, Math.round(per - current.elapsed))} s)` : '')
-                                             : `läuft … ${Math.round(current.elapsed)} s` + (done ? '' : ' (erster Lauf lädt das Modell)')), (done + part) / n);
+    const pre = n > 1 ? tr('Bild {i} von {n}', {i: done + 1, n}) + (n - done > 1 ? ' ' + tr('(noch ca. {time})', {time: fmtDur(rest)}) : '') + ': ' : '';
+    if (!current || current.state === 'queued') status(pre + (current && current.ahead ? tr('in der Warteschlange ({n} davor) …', {n: current.ahead}) : tr('wartet auf den Start …')), done / n);
+    else status(pre + tr('läuft … {s} s', {s: Math.round(current.elapsed)}) + (current.elapsed < per
+                  ? (n === 1 ? ' ' + tr('(noch ca. {time})', {time: Math.max(0, Math.round(per - current.elapsed)) + ' s'}) : '')
+                  : (done ? '' : tr(' (erster Lauf lädt das Modell)'))), (done + part) / n);
     pollTimer = setTimeout(tick, 1000);
   };
   tick();
@@ -611,13 +616,13 @@ async function cancelBatch() {
   if (!b) return;
   const open = b.ids.filter(id => !b.res[id]);
   if (!open.length) return;
-  if (open.length > 1 && !await askDialog({title: 'Serie abbrechen?', ok: 'Abbrechen', danger: true,
-      text: `${open.length} Bilder sind noch offen. Fertige Bilder bleiben erhalten.`})) return;
+  if (open.length > 1 && !await askDialog({title: tr('Serie abbrechen?'), ok: tr('Abbrechen'), danger: true,
+      text: tr('{n} Bilder sind noch offen. Fertige Bilder bleiben erhalten.', {n: open.length})})) return;
   $('cancel').disabled = true;
   try {
     const r = await api('/api/jobs/cancel', {method: 'POST', headers: {'Content-Type': 'application/json'},
                                              body: JSON.stringify({ids: open})});
-    toast(r.cancelled ? `Abgebrochen (${r.cancelled === 1 ? '1 Auftrag' : r.cancelled + ' Aufträge'})` : 'War schon fertig');
+    toast(r.cancelled ? (r.cancelled === 1 ? tr('Abgebrochen (1 Auftrag)') : tr('Abgebrochen ({n} Aufträge)', {n: r.cancelled})) : tr('War schon fertig'));
   } catch (e) { toast(e.message, true); }
   $('cancel').disabled = false;
 }
@@ -641,7 +646,7 @@ function finished(b, id, j) {
     slot.replaceWith(recentTile(img));
   } else {
     slot.className = 'failed';
-    slot.textContent = j.state === 'cancelled' ? 'abgebrochen' : j.state === 'done' ? 'kein Bild' : 'Fehler';
+    slot.textContent = j.state === 'cancelled' ? tr('abgebrochen') : j.state === 'done' ? tr('kein Bild') : tr('Fehler');
     slot.title = j.error || '';
   }
   // Galerie nachziehen, bei grossen Serien hoechstens alle 5 s
@@ -657,16 +662,16 @@ function allDone(b) {
   const secs = Math.round((Date.now() - b.started) / 1000);
   if (b.ids.length === 1) {
     const j = vals[0];
-    if (j.state === 'cancelled') status('Abgebrochen.', null);
-    else if (j.state !== 'done') status('Fehler: ' + j.error, null, true);
-    else if (!j.images.length) status('Fertig, aber ohne Bild (vermutlich direkt gelöscht).', null, true);
+    if (j.state === 'cancelled') status(tr('Abgebrochen.'), null);
+    else if (j.state !== 'done') status(tr('Fehler: {error}', {error: j.error}), null, true);
+    else if (!j.images.length) status(tr('Fertig, aber ohne Bild (vermutlich direkt gelöscht).'), null, true);
     else status('');
   } else {
-    const parts = [`${ok} von ${b.ids.length} fertig`];
-    if (cancelled) parts.push(`${cancelled} abgebrochen`);
-    if (bad.length) parts.push(`${bad.length} mit Fehler: ${bad[0].error || ''}`);
+    const parts = [tr('{ok} von {n} fertig', {ok, n: b.ids.length})];
+    if (cancelled) parts.push(tr('{n} abgebrochen', {n: cancelled}));
+    if (bad.length) parts.push(tr('{n} mit Fehler: {error}', {n: bad.length, error: bad[0].error || ''}));
     status(ok === b.ids.length ? '' : parts.join(', '), null, !!bad.length);
-    $('res-meta').textContent = `${ok === 1 ? '1 Bild' : ok + ' Bilder'} · ${fmtDur(secs)}`;
+    $('res-meta').textContent = `${ok === 1 ? tr('1 Bild') : tr('{n} Bilder', {n: ok})} · ${fmtDur(secs)}`;
   }
   loadRecent();
 }
@@ -679,7 +684,7 @@ function showResult(img, j) {
   showMedia($('res-img'), $('res-vid'), img, url);
   $('res-edit').style.display = isVideo(img) ? 'none' : '';
   $('res-save').href = url; $('res-save').setAttribute('download', img.filename);
-  $('res-meta').textContent = [j.title, j.elapsed ? j.elapsed + ' s' : '', j.seed != null ? 'Seed ' + j.seed : ''].filter(Boolean).join(' · ');
+  $('res-meta').textContent = [tr(j.title), j.elapsed ? j.elapsed + ' s' : '', j.seed != null ? 'Seed ' + j.seed : ''].filter(Boolean).join(' · ');
   $('result').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
@@ -704,7 +709,7 @@ async function loadRecent(reset = true) {
     items.forEach(i => { recent.push(i); $('recent').appendChild(recentTile(i)); });
     recentDone = items.length < 30;
     $('recent-empty').style.display = recent.length ? 'none' : '';
-  } catch (e) { toast('Galerie: ' + e.message, true); }
+  } catch (e) { toast(tr('Galerie: {error}', {error: e.message}), true); }
   recentBusy = false;
   // passt die erste Seite auf den Bildschirm, gleich weiterladen
   if (!recentDone && $('sentinel').getBoundingClientRect().top < innerHeight + 400) setTimeout(() => loadRecent(false), 50);
@@ -715,19 +720,20 @@ function toggleSel(i, d) {
   const k = key(i);
   selected.has(k) ? selected.delete(k) : selected.add(k);
   d.classList.toggle('sel', selected.has(k));
-  $('sel-del').textContent = `Löschen (${selected.size})`;
-  $('sel-dl').textContent = `Laden (${selected.size})`;
-  $('sel-edit').textContent = `Bearbeiten (${selected.size})`;
+  $('sel-del').textContent = tr('Löschen ({n})', {n: selected.size});
+  $('sel-dl').textContent = tr('Laden ({n})', {n: selected.size});
+  $('sel-edit').textContent = tr('Bearbeiten ({n})', {n: selected.size});
 }
 function endSel() {
   selecting = false; selected.clear(); document.body.classList.remove('selecting'); $('selbar').classList.remove('show');
-  $('sel-toggle').textContent = 'Auswählen'; $('sel-del').textContent = 'Löschen (0)'; $('sel-dl').textContent = 'Laden (0)'; $('sel-edit').textContent = 'Bearbeiten (0)';
+  $('sel-toggle').textContent = tr('Auswählen'); $('sel-del').textContent = tr('Löschen ({n})', {n: 0});
+  $('sel-dl').textContent = tr('Laden ({n})', {n: 0}); $('sel-edit').textContent = tr('Bearbeiten ({n})', {n: 0});
   document.querySelectorAll('#recent .t.sel').forEach(t => t.classList.remove('sel'));
 }
 async function deleteImages(list) {
   if (!list.length) return false;
-  const ok = await askDialog({title: list.length > 1 ? `${list.length} Bilder löschen?` : 'Bild löschen?',
-                              text: 'Das lässt sich nicht rückgängig machen.', ok: 'Löschen', danger: true});
+  const ok = await askDialog({title: list.length > 1 ? tr('{n} Bilder löschen?', {n: list.length}) : tr('Bild löschen?'),
+                              text: tr('Das lässt sich nicht rückgängig machen.'), ok: tr('Löschen'), danger: true});
   if (!ok) return false;
   try {
     await api('/api/my/delete', {method:'POST', headers:{'Content-Type':'application/json'},
@@ -740,7 +746,7 @@ async function deleteImages(list) {
   if (shown && gone.has(key(shown))) { $('result').style.display = 'none'; shown = null; }
   setInputs(inputs.filter(i => !(i.source && (gone.has(i.source) || gone.has('/' + i.source)))));
   lb.close();
-  toast(list.length > 1 ? `${list.length} Bilder gelöscht` : 'Bild gelöscht');
+  toast(list.length > 1 ? tr('{n} Bilder gelöscht', {n: list.length}) : tr('Bild gelöscht'));
   return true;
 }
 
@@ -751,7 +757,7 @@ function openLb(i) {
   showMedia($('lb-img'), $('lb-vid'), i, url);
   $('lb-edit').style.display = isVideo(i) ? 'none' : '';
   $('lb-save').href = url; $('lb-save').setAttribute('download', i.filename);
-  $('lb-info').textContent = [i.workflow, i.created ? fmtDate(i.created) : '', i.prompt].filter(Boolean).join(' · ');
+  $('lb-info').textContent = [i.workflow && tr(i.workflow), i.created ? fmtDate(i.created) : '', i.prompt].filter(Boolean).join(' · ');
   $('lb-edit').onclick = () => useAsInput(i);
   $('lb-reuse').onclick = () => reusePrompt(i);
   $('lb-reuse').disabled = !i.prompt;
@@ -764,43 +770,45 @@ $('lb').onclick = e => { if (e.target === $('lb') || e.target === $('lb-img')) l
 // ---------------------------------------------------------------- Ereignisse
 $('sel-toggle').onclick = () => {
   if (selecting) return endSel();
-  selecting = true; document.body.classList.add('selecting'); $('selbar').classList.add('show'); $('sel-toggle').textContent = 'Fertig';
+  selecting = true; document.body.classList.add('selecting'); $('selbar').classList.add('show'); $('sel-toggle').textContent = tr('Fertig');
 };
 $('sel-cancel').onclick = endSel;
 $('sel-edit').onclick = () => {
   const all = recent.filter(i => selected.has(key(i))), list = all.filter(i => !isVideo(i));
-  if (!list.length) return toast(all.length ? 'Videos können nicht als Eingabe dienen' : 'Nichts ausgewählt', true);
-  if (list.length < all.length) toast('Videos übersprungen - als Eingabe gehen nur Bilder', true);
+  if (!list.length) return toast(all.length ? tr('Videos können nicht als Eingabe dienen') : tr('Nichts ausgewählt'), true);
+  if (list.length < all.length) toast(tr('Videos übersprungen – als Eingabe gehen nur Bilder'), true);
   endSel(); useAsInput(list);
-  toast(list.length > 1 ? `${list.length} Bilder als Eingabe übernommen` : 'Bild als Eingabe übernommen');
+  toast(list.length > 1 ? tr('{n} Bilder als Eingabe übernommen', {n: list.length}) : tr('Bild als Eingabe übernommen'));
 };
 $('sel-del').onclick = async () => { if (await deleteImages(recent.filter(i => selected.has(key(i))))) endSel(); };
 $('sel-dl').onclick = async () => {
   const items = recent.filter(i => selected.has(key(i))).map(i => ({subfolder: i.subfolder || '', filename: i.filename}));
-  if (!items.length) return toast('Nichts ausgewählt', true);
+  if (!items.length) return toast(tr('Nichts ausgewählt'), true);
   await downloadZip('/api/my/zip', {items});
   endSel();
 };
 $('dl-all').onclick = async () => {
   try {
     const s = await api('/api/my/summary');
-    if (!s.count) return toast('Noch keine Bilder');
-    downloadZip('/api/my/zip', null, `ZIP mit ${s.count === 1 ? '1 Bild' : s.count + ' Bildern'} (${fmtSize(s.size)}) wird erstellt …`);
+    if (!s.count) return toast(tr('Noch keine Bilder'));
+    downloadZip('/api/my/zip', null, s.count === 1 ? tr('ZIP mit 1 Bild ({size}) wird erstellt …', {size: fmtSize(s.size)})
+                                                   : tr('ZIP mit {n} Bildern ({size}) wird erstellt …', {n: s.count, size: fmtSize(s.size)}));
   } catch (e) { toast(e.message, true); }
 };
 $('del-all').onclick = async () => {
   let s;
   try { s = await api('/api/my/summary'); } catch (e) { return toast(e.message, true); }
-  if (!s.count) return toast('Noch keine Bilder');
-  const v = await askDialog({title: 'Alle deine Bilder löschen?', ok: 'Alle löschen', danger: true,
-    text: `${s.count === 1 ? '1 Bild' : s.count + ' Bilder'}, ${fmtSize(s.size)}. Endgültig - das lässt sich nicht rückgängig machen. Tipp: vorher „Alle laden“.`,
-    fields: [{name: 'c', label: 'Zum Bestätigen LÖSCHEN eintippen'}],
-    check: v => v.c.trim().toUpperCase() !== 'LÖSCHEN' ? 'Bitte genau LÖSCHEN eintippen' : null});
+  if (!s.count) return toast(tr('Noch keine Bilder'));
+  const v = await askDialog({title: tr('Alle deine Bilder löschen?'), ok: tr('Alle löschen'), danger: true,
+    text: (s.count === 1 ? tr('1 Bild') : tr('{n} Bilder', {n: s.count})) + ', ' + fmtSize(s.size) + '. ' +
+          tr('Endgültig – das lässt sich nicht rückgängig machen. Tipp: vorher „Alle laden“.'),
+    fields: [{name: 'c', label: tr('Zum Bestätigen LÖSCHEN eintippen')}],
+    check: v => v.c.trim().toUpperCase() !== tr('LÖSCHEN') ? tr('Bitte genau LÖSCHEN eintippen') : null});
   if (!v) return;
   try {
     const r = await api('/api/my/delete', {method: 'POST', headers: {'Content-Type': 'application/json'},
                                            body: JSON.stringify({all: true, confirm: 'LÖSCHEN'})});
-    toast(`${r.deleted === 1 ? '1 Bild' : r.deleted + ' Bilder'} gelöscht`);
+    toast(r.deleted === 1 ? tr('1 Bild gelöscht') : tr('{n} Bilder gelöscht', {n: r.deleted}));
     $('result').style.display = 'none'; shown = null;
     setInputs(inputs.filter(i => i.file));
     loadRecent();
@@ -840,7 +848,7 @@ $('api-keys').onclick = () => manageApiKeys(api);
 (async () => {
   setInputs([]);
   try { workflows = await api('/api/workflows'); }
-  catch (e) { status('Workflows nicht ladbar: ' + e.message, null, true); return; }
+  catch (e) { status(tr('Workflows nicht ladbar: {error}', {error: e.message}), null, true); return; }
   setMode(workflows.some(w => tabOf(w) === mode) ? mode : 'generate');
   loadRecent();
   api('/api/me').then(m => { $('who').textContent = m.name; if (m.admin) $('admin-link').style.display = ''; }).catch(() => {});
@@ -848,7 +856,7 @@ $('api-keys').onclick = () => manageApiKeys(api);
   try {
     const active = await api('/api/jobs/active');
     if (active.length) {
-      busy(true); status('Läuft …', 0);
+      busy(true); status(tr('Läuft …'), 0);
       track(active.map(a => a.prompt_id), (workflows.find(w => w.file === active[0].workflow) || {}).seconds);
     }
   } catch {}

@@ -12,7 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY workflows/build_workflows.py ./build_workflows.py
 COPY workflows/assets/*.png ./assets/
 COPY workflows/platzhalter.png ./assets/bild_hier_hochladen.png
-COPY webapp/app.py webapp/version.py webapp/start.sh ./
+COPY webapp/app.py webapp/version.py webapp/i18n.py webapp/start.sh ./
+COPY webapp/locales ./locales
 COPY webapp/static ./static
 
 ENV COMFYUI_URL=http://comfyui:8188 \

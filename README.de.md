@@ -28,7 +28,7 @@
 | **Variablen & Serien** | `[rot\|blau]` und benannte, verschachtelte Variablen; Serien beliebiger Länge, gleichmäßig gewürfelt, abbrechbar |
 | **Bild als Eingabe** | Mehrere Bilder auf einmal mit demselben Prompt bearbeiten oder animieren |
 | **Videos** | Länge, Bewegungsstärke in 5 Stufen, Format passend zum Startbild |
-| **Benutzer** | Einrichtungsassistent, Admin und Benutzer, jeder sieht nur eigene Bilder, NSFW-Freigabe je Benutzer, ZIP-Download. Oberfläche auf Deutsch |
+| **Benutzer** | Einrichtungsassistent, Admin und Benutzer, jeder sieht nur eigene Bilder, NSFW-Freigabe je Benutzer, ZIP-Download. Oberfläche auf Deutsch und Englisch |
 | **API** | Schlüssel je Benutzer: eigene API (`/api/v1/*`) und OpenAI-kompatibel (`/v1/images/generations`, `/v1/images/edits`) – z. B. für Open WebUI |
 | **Erweiterungen** | Eigene Workflows, Auswahlen und LoRAs als `extras/*.py`, ohne den Code zu ändern |
 | **Speicher** | Erweiterung `proxy_memory` gibt den RAM von ComfyUI auf Unified-Memory-Systemen wirklich frei; als Modul des OllamaProxy wird ComfyUI nach Leerlauf freigegeben |
@@ -109,9 +109,9 @@ flowchart LR
 
 ## Dokumentation
 
-- [MODELLE.md](MODELLE.md) – welche Modelle, wohin, woher, unter welcher Lizenz
-- [docs/technik.md](docs/technik.md) – Aufbau, Workflows im Detail, Messwerte, Web-App, API, Sicherheit
-- [workflows/extras/README.md](workflows/extras/README.md) – eigene Erweiterungen schreiben
+- [MODELLE.md](MODELLE.md) – welche Modelle, wohin, woher, unter welcher Lizenz (Englisch: [MODELS.md](MODELS.md))
+- [docs/technik.md](docs/technik.md) – Aufbau, Workflows im Detail, Messwerte, Web-App, API, Sicherheit (Englisch: [technik.en.md](docs/technik.en.md))
+- [workflows/extras/README.md](workflows/extras/README.md) – eigene Erweiterungen schreiben (Englisch: [README.en.md](workflows/extras/README.en.md))
 - [CHANGELOG.md](CHANGELOG.md) – Versionsverlauf (nur Englisch)
 - [CONTRIBUTING.md](CONTRIBUTING.md) – Entwicklungsumgebung, Tests, Regeln (nur Englisch, mit deutschem Abschnitt)
 - [SECURITY.md](SECURITY.md) – Sicherheitslücken melden (nur Englisch)

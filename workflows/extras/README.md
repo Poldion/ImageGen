@@ -1,5 +1,7 @@
 # Erweiterungen für die Workflows
 
+🇬🇧 [English](README.en.md) · 🇩🇪 Deutsch
+
 Jede Datei `*.py` in diesem Ordner (oder im Ordner aus `--extras` / `IMAGEGEN_EXTRAS`, in Docker
 `${IMAGEGEN_DATA}/extras`) wird von `build_workflows.py` geladen. Ihre Funktion `apply(b)` bekommt das
 Modul `build_workflows` und kann alles daran ändern, bevor die Dateien geschrieben werden:

@@ -1,5 +1,7 @@
 # Technik und Hintergründe
 
+🇬🇧 [English](technik.en.md) · 🇩🇪 Deutsch
+
 Ergänzung zur [README](../README.md): wie die Teile gebaut sind, warum, und was gemessen wurde. Messwerte stammen von
 einem Ryzen AI Max+ 395 (iGPU Radeon 8060S, `gfx1151`, 128 GB Unified Memory, davon bis 108 GiB für die GPU).
 

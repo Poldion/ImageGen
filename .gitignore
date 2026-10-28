@@ -6,6 +6,7 @@ __pycache__/
 # Eigene Workflow-Erweiterungen bleiben privat
 workflows/extras/*
 !workflows/extras/README.md
+!workflows/extras/README.en.md
 
 # Laufzeitdaten, falls testweise im Repo gestartet
 data/

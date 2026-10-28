@@ -28,7 +28,7 @@
 | **Variables & series** | `[red\|blue]` and named, nested variables; series of any length, evenly randomized, cancelable |
 | **Image as input** | Edit or animate several images at once with the same prompt |
 | **Videos** | Length, motion strength in 5 levels, format matching the start image |
-| **Users** | Setup wizard, admin and users, everyone sees only their own images, NSFW permission per user, ZIP download. UI in German |
+| **Users** | Setup wizard, admin and users, everyone sees only their own images, NSFW permission per user, ZIP download. UI in English and German |
 | **API** | Keys per user: own API (`/api/v1/*`) and OpenAI-compatible (`/v1/images/generations`, `/v1/images/edits`) – e.g. for Open WebUI |
 | **Extensions** | Own workflows, options and LoRAs as `extras/*.py`, without changing the code |
 | **Memory** | The `proxy_memory` extension really frees ComfyUI's RAM on unified-memory systems; as an OllamaProxy module ComfyUI is freed after idle time |
@@ -46,7 +46,7 @@ docker compose --env-file ~/imagegen/imagegen.env up -d --build
 
 Then open `http://<host>:8190/` and create the admin account in the wizard. ComfyUI itself runs at
 `http://<host>:8188/`. Download the **models** yourself into `~/imagegen/models/` – which file goes into which folder
-and where it comes from is listed in [MODELLE.md](MODELLE.md) (German). For the workflow menu in ComfyUI, copy
+and where it comes from is listed in [MODELS.md](MODELS.md). For the workflow menu in ComfyUI, copy
 `workflows/*.json` to `~/imagegen/comfy-user/default/workflows/`.
 
 ## Configuration
@@ -109,11 +109,11 @@ flowchart LR
 
 ## Documentation
 
-- [MODELLE.md](MODELLE.md) – which models, where to put them, where to get them, which license (German)
-- [docs/technik.md](docs/technik.md) – architecture, workflows in detail, measurements, web app, API, security (German)
-- [workflows/extras/README.md](workflows/extras/README.md) – writing your own extensions (German)
+- [MODELS.md](MODELS.md) – which models, where to put them, where to get them, which license (German: [MODELLE.md](MODELLE.md))
+- [docs/technik.en.md](docs/technik.en.md) – architecture, workflows in detail, measurements, web app, API, security (German: [technik.md](docs/technik.md))
+- [workflows/extras/README.en.md](workflows/extras/README.en.md) – writing your own extensions (German: [README.md](workflows/extras/README.md))
 - [CHANGELOG.md](CHANGELOG.md) – version history
-- [CONTRIBUTING.md](CONTRIBUTING.md) – development setup, tests, guidelines
+- [CONTRIBUTING.md](CONTRIBUTING.md) – development setup, tests, guidelines, translations
 - [SECURITY.md](SECURITY.md) – reporting security issues
 
 ## Development

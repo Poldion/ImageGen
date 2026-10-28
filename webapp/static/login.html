@@ -7,6 +7,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon.svg">
 <link rel="stylesheet" href="/common.css">
+<script src="/i18n.js"></script>
 <title>Bilder – Anmelden</title>
 </head>
 <body>
@@ -18,9 +19,12 @@
     <input id="pw" type="password" autocomplete="current-password" placeholder="Passwort">
     <button class="primary" type="submit" id="go">Anmelden</button>
     <div class="err" id="err"></div>
+    <span id="lang"></span>
   </form>
 </div>
 <script>
+i18nApply();
+document.getElementById('lang').replaceWith(langSwitch('link'));
 document.getElementById('f').addEventListener('submit', async e => {
   e.preventDefault();
   const err = document.getElementById('err'), go = document.getElementById('go');
@@ -29,8 +33,8 @@ document.getElementById('f').addEventListener('submit', async e => {
     const r = await fetch('/api/login', {method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({name: document.getElementById('name').value, password: document.getElementById('pw').value})});
     if (r.ok) { location.replace(location.pathname + '?t=' + Date.now()); return; }
-    err.textContent = (await r.json().catch(() => ({}))).detail || 'Anmeldung fehlgeschlagen';
-  } catch { err.textContent = 'Server nicht erreichbar'; }
+    err.textContent = (await r.json().catch(() => ({}))).detail || tr('Anmeldung fehlgeschlagen');
+  } catch { err.textContent = tr('Server nicht erreichbar'); }
   go.disabled = false;
 });
 </script>

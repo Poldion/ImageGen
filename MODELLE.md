@@ -1,5 +1,7 @@
 # Modelle
 
+🇬🇧 [English](MODELS.md) · 🇩🇪 Deutsch
+
 Modelle werden **nicht mitgeliefert**. Diese Liste sagt, welche Datei in welchen Ordner unter
 `${IMAGEGEN_DATA}/models/` gehört und woher sie kommt. Du brauchst nur die Modelle der Workflows, die du nutzen
 willst. Maßgeblich für die Lizenz ist immer die Modellkarte der Quelle; die Angaben hier sind eine Hilfe, keine
