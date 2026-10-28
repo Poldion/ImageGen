@@ -1,0 +1,326 @@
+{
+ "anime_anima": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "width": {
+   "node": "20",
+   "key": "width"
+  },
+  "height": {
+   "node": "20",
+   "key": "height"
+  },
+  "steps": {
+   "node": "30",
+   "key": "steps"
+  },
+  "seed": {
+   "node": "30",
+   "key": "seed"
+  }
+ },
+ "gezeichnet_dnd": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "width": {
+   "node": "20",
+   "key": "width"
+  },
+  "height": {
+   "node": "20",
+   "key": "height"
+  },
+  "seed": {
+   "node": "17",
+   "key": "noise_seed"
+  }
+ },
+ "dnd_ort": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "width": {
+   "node": "20",
+   "key": "width"
+  },
+  "height": {
+   "node": "20",
+   "key": "height"
+  },
+  "seed": {
+   "node": "17",
+   "key": "noise_seed"
+  }
+ },
+ "dnd_token": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "seed": {
+   "node": "17",
+   "key": "noise_seed"
+  }
+ },
+ "dnd_battlemap": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "width": {
+   "node": "20",
+   "key": "width"
+  },
+  "height": {
+   "node": "20",
+   "key": "height"
+  },
+  "seed": {
+   "node": "30",
+   "key": "seed"
+  }
+ },
+ "dnd_ortskarte": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "width": {
+   "node": "20",
+   "key": "width"
+  },
+  "height": {
+   "node": "20",
+   "key": "height"
+  },
+  "seed": {
+   "node": "30",
+   "key": "seed"
+  }
+ },
+ "flux3_klein": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "width": {
+   "node": "20",
+   "key": "width"
+  },
+  "height": {
+   "node": "20",
+   "key": "height"
+  },
+  "steps": {
+   "node": "30",
+   "key": "steps"
+  },
+  "seed": {
+   "node": "30",
+   "key": "seed"
+  }
+ },
+ "realistisch_qwen21": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "width": {
+   "node": "20",
+   "key": "width"
+  },
+  "height": {
+   "node": "20",
+   "key": "height"
+  },
+  "seed": {
+   "node": "17",
+   "key": "noise_seed"
+  }
+ },
+ "bearbeiten_qwen21": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "image": {
+   "node": "6",
+   "key": "image"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "seed": {
+   "node": "17",
+   "key": "noise_seed"
+  }
+ },
+ "charakter_qwen21": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "image": {
+   "node": "6",
+   "key": "image"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "width": {
+   "node": "20",
+   "key": "width"
+  },
+  "height": {
+   "node": "20",
+   "key": "height"
+  },
+  "seed": {
+   "node": "17",
+   "key": "noise_seed"
+  }
+ },
+ "dnd_token_bild": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "image": {
+   "node": "6",
+   "key": "image"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "seed": {
+   "node": "17",
+   "key": "noise_seed"
+  }
+ },
+ "video_wan22_t2v": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "seed": {
+   "node": "30",
+   "key": "noise_seed"
+  },
+  "width": {
+   "node": "20",
+   "key": "width"
+  },
+  "height": {
+   "node": "20",
+   "key": "height"
+  },
+  "length": {
+   "node": "20",
+   "key": "length"
+  }
+ },
+ "video_wan22_i2v": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "image": {
+   "node": "6",
+   "key": "image"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "seed": {
+   "node": "30",
+   "key": "noise_seed"
+  },
+  "width": {
+   "node": "21",
+   "key": "width"
+  },
+  "height": {
+   "node": "21",
+   "key": "height"
+  },
+  "length": {
+   "node": "21",
+   "key": "length"
+  }
+ },
+ "video_wan22_i2v_hq": {
+  "prompt": {
+   "node": "10",
+   "key": "value"
+  },
+  "image": {
+   "node": "6",
+   "key": "image"
+  },
+  "model": {
+   "node": "1",
+   "key": "unet_name"
+  },
+  "seed": {
+   "node": "30",
+   "key": "noise_seed"
+  },
+  "width": {
+   "node": "21",
+   "key": "width"
+  },
+  "height": {
+   "node": "21",
+   "key": "height"
+  },
+  "length": {
+   "node": "21",
+   "key": "length"
+  }
+ }
+}

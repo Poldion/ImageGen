@@ -1,0 +1,7 @@
+# Build-Kontext imagegen/ (Web-App): nur Code, keine privaten Erweiterungen oder Caches
+**/__pycache__
+**/*.pyc
+workflows/extras/
+workflows/api/
+workflows/*.json
+docs/

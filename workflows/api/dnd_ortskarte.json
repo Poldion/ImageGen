@@ -1,0 +1,168 @@
+{
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "anima-aesthetic-v1.1.safetensors",
+   "weight_dtype": "default"
+  },
+  "_meta": {
+   "title": "UNETLoader"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "qwen_3_06b_base.safetensors",
+   "type": "stable_diffusion",
+   "device": "default"
+  },
+  "_meta": {
+   "title": "CLIPLoader"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "qwen_image_vae.safetensors"
+  },
+  "_meta": {
+   "title": "VAELoader"
+  }
+ },
+ "5": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "model": [
+    "1",
+    0
+   ],
+   "lora_name": "mapcraft_anima_v1.safetensors",
+   "strength_model": 1.0
+  },
+  "_meta": {
+   "title": "Mapcraft-LoRA"
+  }
+ },
+ "10": {
+  "class_type": "PrimitiveStringMultiline",
+  "inputs": {
+   "value": "A village of about forty houses with red, brown and grey roofs along winding cobblestone roads, a market square with a well, a temple, a river with a wooden bridge, a wooden palisade, dense forest around it."
+  },
+  "_meta": {
+   "title": "Prompt - dein Motiv"
+  }
+ },
+ "11": {
+  "class_type": "StringConcatenate",
+  "inputs": {
+   "string_a": "masterpiece, best quality, mapcraft, battle map, top-down view, from above, no humans, hand-drawn top-down fantasy settlement map like Inkarnate and Dungeondraft town maps, seen from directly above, every building drawn as its roof with ridge lines and colored roof tiles, thick black ink outlines around all buildings and trees, soft watercolor-textured muted colors, light green grass washes, round dark green tree canopies, light grey cobblestone roads, flat even lighting, no grid",
+   "string_b": [
+    "10",
+    0
+   ],
+   "delimiter": ". "
+  },
+  "_meta": {
+   "title": "StringConcatenate"
+  }
+ },
+ "12": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": [
+    "11",
+    0
+   ],
+   "clip": [
+    "2",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "CLIPTextEncode"
+  }
+ },
+ "13": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "worst quality, low quality, blurry, anime, vibrant saturated colors, glossy, 3d render, photo, perspective, isometric, side view, people, characters, text, labels, watermark, grid, light glow, lens flare",
+   "clip": [
+    "2",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "Negativ-Prompt"
+  }
+ },
+ "20": {
+  "class_type": "EmptyLatentImage",
+  "inputs": {
+   "width": 1280,
+   "height": 960,
+   "batch_size": 1
+  },
+  "_meta": {
+   "title": "EmptyLatentImage"
+  }
+ },
+ "30": {
+  "class_type": "KSampler",
+  "inputs": {
+   "model": [
+    "5",
+    0
+   ],
+   "seed": 0,
+   "steps": 30,
+   "cfg": 4.5,
+   "sampler_name": "er_sde",
+   "scheduler": "simple",
+   "positive": [
+    "12",
+    0
+   ],
+   "negative": [
+    "13",
+    0
+   ],
+   "latent_image": [
+    "20",
+    0
+   ],
+   "denoise": 1.0
+  },
+  "_meta": {
+   "title": "KSampler"
+  }
+ },
+ "40": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "30",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "VAEDecode"
+  }
+ },
+ "50": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "images": [
+    "40",
+    0
+   ],
+   "filename_prefix": "Gezeichnet/DnD_Ortskarte"
+  },
+  "_meta": {
+   "title": "SaveImage"
+  }
+ }
+}

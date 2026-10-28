@@ -1,0 +1,949 @@
+[
+ {
+  "title": "Gezeichnet - D&D",
+  "file": "gezeichnet_dnd",
+  "mode": "generate",
+  "summary": "Gemalt im Stil der D&D-5e-Bücher",
+  "seconds": 32,
+  "default_size": [
+   1344,
+   768
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "width": {
+    "node": "20",
+    "key": "width"
+   },
+   "height": {
+    "node": "20",
+    "key": "height"
+   },
+   "seed": {
+    "node": "17",
+    "key": "noise_seed"
+   }
+  },
+  "kind": "image",
+  "group": "Gezeichnet - D&D",
+  "variant": "Illustration",
+  "tab": "dnd",
+  "enhance_hint": "Lighting and colors like official D&D book art: bright, clearly lit, colorful, mixed warm and cool light, saturated jewel tones. Avoid dim, dark, murky or candle-lit-only scenes unless asked."
+ },
+ {
+  "title": "Realistisch - Qwen 2.1",
+  "file": "realistisch_qwen21",
+  "mode": "generate",
+  "summary": "Fotorealistisch, versteht lange Beschreibungen",
+  "seconds": 32,
+  "default_size": [
+   1024,
+   1024
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "width": {
+    "node": "20",
+    "key": "width"
+   },
+   "height": {
+    "node": "20",
+    "key": "height"
+   },
+   "seed": {
+    "node": "17",
+    "key": "noise_seed"
+   }
+  },
+  "kind": "image",
+  "enhance_hint": "It is a photograph: you may name the framing and natural light, like a real photo caption."
+ },
+ {
+  "title": "Anime - Anima",
+  "file": "anime_anima",
+  "mode": "generate",
+  "summary": "Anime, normale Sätze",
+  "seconds": 13,
+  "default_size": [
+   1024,
+   1024
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "width": {
+    "node": "20",
+    "key": "width"
+   },
+   "height": {
+    "node": "20",
+    "key": "height"
+   },
+   "steps": {
+    "node": "30",
+    "key": "steps"
+   },
+   "seed": {
+    "node": "30",
+    "key": "seed"
+   }
+  },
+  "kind": "image",
+  "enhance_hint": "Anime illustration: describe character design details (hair color and style, eye color, outfit)."
+ },
+ {
+  "title": "Bearbeiten - Qwen 2.1",
+  "file": "bearbeiten_qwen21",
+  "mode": "edit",
+  "summary": "Bild nach Anweisung ändern; Größe folgt dem Bild",
+  "seconds": 70,
+  "default_size": null,
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "image": {
+    "node": "6",
+    "key": "image"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "seed": {
+    "node": "17",
+    "key": "noise_seed"
+   }
+  },
+  "kind": "image"
+ },
+ {
+  "title": "Charakter - Qwen 2.1",
+  "file": "charakter_qwen21",
+  "mode": "edit",
+  "summary": "Gleiche Figur in neuer Szene, Pose, Kleidung",
+  "seconds": 65,
+  "default_size": [
+   1344,
+   768
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "image": {
+    "node": "6",
+    "key": "image"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "width": {
+    "node": "20",
+    "key": "width"
+   },
+   "height": {
+    "node": "20",
+    "key": "height"
+   },
+   "seed": {
+    "node": "17",
+    "key": "noise_seed"
+   }
+  },
+  "kind": "image",
+  "enhance_hint": "The character from the image is kept automatically: describe only the new scene, pose, action, expression and any requested clothing changes; do not re-describe face or identity."
+ },
+ {
+  "title": "D&D - Ort",
+  "file": "dnd_ort",
+  "mode": "generate",
+  "summary": "Orte und Landschaften als weite Totale im D&D-Stil",
+  "seconds": 40,
+  "default_size": [
+   1344,
+   768
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "width": {
+    "node": "20",
+    "key": "width"
+   },
+   "height": {
+    "node": "20",
+    "key": "height"
+   },
+   "seed": {
+    "node": "17",
+    "key": "noise_seed"
+   }
+  },
+  "kind": "image",
+  "group": "Gezeichnet - D&D",
+  "variant": "Ort",
+  "tab": "dnd",
+  "enhance_hint": "A location without a main character: describe landscape or architecture, landmarks, weather, time of day and atmosphere; bright, colorful D&D book-art lighting unless asked otherwise."
+ },
+ {
+  "title": "D&D - Token",
+  "file": "dnd_token",
+  "mode": "generate",
+  "summary": "Rundes Token mit Goldrand, transparent (PNG) für virtuelle Spieltische",
+  "seconds": 40,
+  "default_size": null,
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "seed": {
+    "node": "17",
+    "key": "noise_seed"
+   }
+  },
+  "kind": "image",
+  "group": "Gezeichnet - D&D",
+  "variant": "Token",
+  "tab": "dnd",
+  "enhance_hint": "One character only, head and shoulders, facing the viewer: describe race traits, face, hair, expression, armor/clothing and one signature item; plain background, no scene."
+ },
+ {
+  "title": "D&D - Token aus Bild",
+  "file": "dnd_token_bild",
+  "mode": "edit",
+  "summary": "Figur aus deinem Bild als rundes D&D-Token (PNG); Text optional",
+  "seconds": 65,
+  "default_size": null,
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "image": {
+    "node": "6",
+    "key": "image"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "seed": {
+    "node": "17",
+    "key": "noise_seed"
+   }
+  },
+  "kind": "image",
+  "default_prompt": "Same character.",
+  "group": "Gezeichnet - D&D",
+  "variant": "Token aus Bild",
+  "tab": "dnd",
+  "enhance_hint": "The character comes from the start image; only describe changes the user asks for (expression, headwear, item), short, no scene, no background."
+ },
+ {
+  "title": "D&D - Battlemap",
+  "file": "dnd_battlemap",
+  "mode": "generate",
+  "summary": "Kampfkarte von oben für den virtuellen Spieltisch, ohne Licht und Raster",
+  "seconds": 75,
+  "default_size": [
+   1344,
+   768
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "width": {
+    "node": "20",
+    "key": "width"
+   },
+   "height": {
+    "node": "20",
+    "key": "height"
+   },
+   "seed": {
+    "node": "30",
+    "key": "seed"
+   }
+  },
+  "kind": "image",
+  "group": "Gezeichnet - D&D",
+  "variant": "Battlemap",
+  "tab": "dnd",
+  "enhance_hint": "A top-down tabletop battle map: describe the layout from above (rooms, walls, doors, paths, water, furniture, terrain features and where they are), no people, no perspective, no lighting effects (the virtual tabletop adds light); 40-90 words."
+ },
+ {
+  "title": "D&D - Ortskarte",
+  "file": "dnd_ortskarte",
+  "mode": "generate",
+  "summary": "Dorf oder Stadt von oben, Tusche + Aquarell; große Städte im großen Format",
+  "seconds": 90,
+  "default_size": [
+   1280,
+   960
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "width": {
+    "node": "20",
+    "key": "width"
+   },
+   "height": {
+    "node": "20",
+    "key": "height"
+   },
+   "seed": {
+    "node": "30",
+    "key": "seed"
+   }
+  },
+  "kind": "image",
+  "sizes": [
+   [
+    "Quer 4:3",
+    1280,
+    960
+   ],
+   [
+    "Groß 4:3",
+    1536,
+    1152
+   ],
+   [
+    "Quadrat",
+    1024,
+    1024
+   ],
+   [
+    "Groß quadratisch",
+    1536,
+    1536
+   ],
+   [
+    "Hoch 3:4",
+    960,
+    1280
+   ]
+  ],
+  "group": "Gezeichnet - D&D",
+  "variant": "Ortskarte",
+  "tab": "dnd",
+  "enhance_hint": "A top-down settlement map: describe size (hamlet, village, town, big city), layout from above (walls, gates, districts, main roads, squares, river, bridges, harbor, castle, temples, farmland, forest) and where things are; no people, no perspective, no text; 50-100 words."
+ },
+ {
+  "title": "Test - Flux 3 Klein",
+  "file": "flux3_klein",
+  "mode": "generate",
+  "summary": "Test: FLUX 3 Klein (neu), alles im Text beschreiben",
+  "seconds": 30,
+  "default_size": [
+   1024,
+   1024
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "width": {
+    "node": "20",
+    "key": "width"
+   },
+   "height": {
+    "node": "20",
+    "key": "height"
+   },
+   "steps": {
+    "node": "30",
+    "key": "steps"
+   },
+   "seed": {
+    "node": "30",
+    "key": "seed"
+   }
+  },
+  "kind": "image"
+ },
+ {
+  "title": "Video - Wan 2.2",
+  "file": "video_wan22_t2v",
+  "mode": "generate",
+  "summary": "Video aus Text; Bewegung im Text beschreiben",
+  "seconds": 360,
+  "default_size": [
+   832,
+   480
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "seed": {
+    "node": "30",
+    "key": "noise_seed"
+   },
+   "width": {
+    "node": "20",
+    "key": "width"
+   },
+   "height": {
+    "node": "20",
+    "key": "height"
+   },
+   "length": {
+    "node": "20",
+    "key": "length"
+   }
+  },
+  "kind": "video",
+  "fps": 16,
+  "durations": [
+   3,
+   5,
+   7
+  ],
+  "default_duration": 5,
+  "motion": {
+   "default": 3,
+   "levels": [
+    {
+     "label": "Ruhig",
+     "hint": "Kaum Bewegung, Kamera steht",
+     "suffix": " Very subtle, minimal movement, almost still, locked-off static camera.",
+     "set": [
+      [
+       "8",
+       "shift",
+       4.0
+      ],
+      [
+       "9",
+       "shift",
+       4.0
+      ]
+     ]
+    },
+    {
+     "label": "Wenig",
+     "hint": "Sanfte, langsame Bewegung, ruhige Kamera",
+     "suffix": " Gentle, slow, calm movement, steady camera.",
+     "set": [
+      [
+       "8",
+       "shift",
+       4.5
+      ],
+      [
+       "9",
+       "shift",
+       4.5
+      ]
+     ]
+    },
+    {
+     "label": "Normal",
+     "hint": "Wie im Prompt beschrieben",
+     "suffix": "",
+     "set": [
+      [
+       "8",
+       "shift",
+       5.0
+      ],
+      [
+       "9",
+       "shift",
+       5.0
+      ]
+     ]
+    },
+    {
+     "label": "Viel",
+     "hint": "Lebhafte Bewegung, bewegte Kamera",
+     "suffix": " Lively, energetic movement, dynamic camera motion.",
+     "set": [
+      [
+       "8",
+       "shift",
+       6.5
+      ],
+      [
+       "9",
+       "shift",
+       6.5
+      ]
+     ]
+    },
+    {
+     "label": "Sehr viel",
+     "hint": "Schnelle, kraeftige Action, kann unruhiger werden",
+     "suffix": " Fast, intense, highly dynamic motion, energetic action, quick camera movement.",
+     "set": [
+      [
+       "8",
+       "shift",
+       8.0
+      ],
+      [
+       "9",
+       "shift",
+       8.0
+      ]
+     ]
+    }
+   ]
+  },
+  "sizes": [
+   [
+    "Quer",
+    832,
+    480
+   ],
+   [
+    "Hoch",
+    480,
+    832
+   ],
+   [
+    "Quadrat",
+    640,
+    640
+   ],
+   [
+    "Quer HD",
+    1280,
+    720
+   ]
+  ]
+ },
+ {
+  "title": "Video aus Bild - Wan 2.2",
+  "file": "video_wan22_i2v",
+  "mode": "edit",
+  "summary": "Startbild wird lebendig (schnell, 4 Schritte); Bewegung im Text beschreiben",
+  "seconds": 360,
+  "default_size": [
+   832,
+   480
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "image": {
+    "node": "6",
+    "key": "image"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "seed": {
+    "node": "30",
+    "key": "noise_seed"
+   },
+   "width": {
+    "node": "21",
+    "key": "width"
+   },
+   "height": {
+    "node": "21",
+    "key": "height"
+   },
+   "length": {
+    "node": "21",
+    "key": "length"
+   }
+  },
+  "kind": "video",
+  "fps": 16,
+  "durations": [
+   3,
+   5,
+   7
+  ],
+  "default_duration": 5,
+  "auto_size": true,
+  "motion": {
+   "default": 3,
+   "levels": [
+    {
+     "label": "Ruhig",
+     "hint": "Kaum Bewegung, Kamera steht",
+     "suffix": " Very subtle, minimal movement, almost still, locked-off static camera.",
+     "set": [
+      [
+       "8",
+       "shift",
+       4.0
+      ],
+      [
+       "9",
+       "shift",
+       4.0
+      ]
+     ]
+    },
+    {
+     "label": "Wenig",
+     "hint": "Sanfte, langsame Bewegung, ruhige Kamera",
+     "suffix": " Gentle, slow, calm movement, steady camera.",
+     "set": [
+      [
+       "8",
+       "shift",
+       4.5
+      ],
+      [
+       "9",
+       "shift",
+       4.5
+      ]
+     ]
+    },
+    {
+     "label": "Normal",
+     "hint": "Wie im Prompt beschrieben",
+     "suffix": "",
+     "set": [
+      [
+       "8",
+       "shift",
+       5.0
+      ],
+      [
+       "9",
+       "shift",
+       5.0
+      ]
+     ]
+    },
+    {
+     "label": "Viel",
+     "hint": "Lebhafte Bewegung, bewegte Kamera",
+     "suffix": " Lively, energetic movement, dynamic camera motion.",
+     "set": [
+      [
+       "8",
+       "shift",
+       6.5
+      ],
+      [
+       "9",
+       "shift",
+       6.5
+      ]
+     ]
+    },
+    {
+     "label": "Sehr viel",
+     "hint": "Schnelle, kraeftige Action, kann unruhiger werden",
+     "suffix": " Fast, intense, highly dynamic motion, energetic action, quick camera movement.",
+     "set": [
+      [
+       "8",
+       "shift",
+       8.0
+      ],
+      [
+       "9",
+       "shift",
+       8.0
+      ]
+     ]
+    }
+   ]
+  },
+  "sizes": [
+   [
+    "Quer",
+    832,
+    480
+   ],
+   [
+    "Hoch",
+    480,
+    832
+   ],
+   [
+    "Quadrat",
+    640,
+    640
+   ],
+   [
+    "Quer HD",
+    1280,
+    720
+   ]
+  ]
+ },
+ {
+  "title": "Video aus Bild (Dynamisch) - Wan 2.2",
+  "file": "video_wan22_i2v_hq",
+  "mode": "edit",
+  "summary": "Startbild mit voller Körperbewegung (dynamisch, 16 Schritte)",
+  "seconds": 1260,
+  "default_size": [
+   832,
+   480
+  ],
+  "fields": {
+   "prompt": {
+    "node": "10",
+    "key": "value"
+   },
+   "image": {
+    "node": "6",
+    "key": "image"
+   },
+   "model": {
+    "node": "1",
+    "key": "unet_name"
+   },
+   "seed": {
+    "node": "30",
+    "key": "noise_seed"
+   },
+   "width": {
+    "node": "21",
+    "key": "width"
+   },
+   "height": {
+    "node": "21",
+    "key": "height"
+   },
+   "length": {
+    "node": "21",
+    "key": "length"
+   }
+  },
+  "kind": "video",
+  "fps": 16,
+  "durations": [
+   3,
+   5,
+   7
+  ],
+  "default_duration": 3,
+  "auto_size": true,
+  "motion": {
+   "default": 3,
+   "levels": [
+    {
+     "label": "Ruhig",
+     "hint": "Kaum Bewegung, Kamera steht",
+     "suffix": " Very subtle, minimal movement, almost still, locked-off static camera.",
+     "set": [
+      [
+       "8",
+       "shift",
+       5.0
+      ],
+      [
+       "9",
+       "shift",
+       5.0
+      ],
+      [
+       "30",
+       "end_at_step",
+       6
+      ],
+      [
+       "31",
+       "start_at_step",
+       6
+      ]
+     ]
+    },
+    {
+     "label": "Wenig",
+     "hint": "Sanfte, langsame Bewegung, ruhige Kamera",
+     "suffix": " Gentle, slow, calm movement, steady camera.",
+     "set": [
+      [
+       "8",
+       "shift",
+       6.5
+      ],
+      [
+       "9",
+       "shift",
+       6.5
+      ],
+      [
+       "30",
+       "end_at_step",
+       7
+      ],
+      [
+       "31",
+       "start_at_step",
+       7
+      ]
+     ]
+    },
+    {
+     "label": "Normal",
+     "hint": "Natürliche Bewegung wie im Prompt beschrieben",
+     "suffix": "",
+     "set": [
+      [
+       "8",
+       "shift",
+       8.0
+      ],
+      [
+       "9",
+       "shift",
+       8.0
+      ],
+      [
+       "30",
+       "end_at_step",
+       8
+      ],
+      [
+       "31",
+       "start_at_step",
+       8
+      ]
+     ]
+    },
+    {
+     "label": "Viel",
+     "hint": "Lebhafte Bewegung, bewegte Kamera",
+     "suffix": " Lively, energetic movement, dynamic camera motion.",
+     "set": [
+      [
+       "8",
+       "shift",
+       9.5
+      ],
+      [
+       "9",
+       "shift",
+       9.5
+      ],
+      [
+       "30",
+       "end_at_step",
+       9
+      ],
+      [
+       "31",
+       "start_at_step",
+       9
+      ]
+     ]
+    },
+    {
+     "label": "Sehr viel",
+     "hint": "Schnelle, kräftige Action",
+     "suffix": " Fast, intense, highly dynamic motion, energetic action, quick camera movement.",
+     "set": [
+      [
+       "8",
+       "shift",
+       11.0
+      ],
+      [
+       "9",
+       "shift",
+       11.0
+      ],
+      [
+       "30",
+       "end_at_step",
+       9
+      ],
+      [
+       "31",
+       "start_at_step",
+       9
+      ]
+     ]
+    }
+   ]
+  },
+  "sizes": [
+   [
+    "Quer",
+    832,
+    480
+   ],
+   [
+    "Hoch",
+    480,
+    832
+   ],
+   [
+    "Quadrat",
+    640,
+    640
+   ],
+   [
+    "Quer HD",
+    1280,
+    720
+   ]
+  ]
+ }
+]

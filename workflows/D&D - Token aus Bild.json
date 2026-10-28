@@ -1,0 +1,1142 @@
+{
+ "last_node_id": 23,
+ "last_link_id": 24,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "UNETLoader",
+   "pos": [
+    40,
+    60
+   ],
+   "size": [
+    340,
+    174
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "slot_index": 0,
+     "links": [
+      1
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "qwen_image_2.1_turbo_bf16.safetensors",
+    "default"
+   ]
+  },
+  {
+   "id": 2,
+   "type": "CLIPLoader",
+   "pos": [
+    40,
+    300
+   ],
+   "size": [
+    340,
+    202
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "slot_index": 0,
+     "links": [
+      4
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPLoader"
+   },
+   "widgets_values": [
+    "qwen3vl_8b_bf16.safetensors",
+    "qwen_image",
+    "default"
+   ]
+  },
+  {
+   "id": 3,
+   "type": "VAELoader",
+   "pos": [
+    40,
+    540
+   ],
+   "size": [
+    340,
+    146
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "slot_index": 0,
+     "links": [
+      7,
+      17
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "qwen_image_2.1_vae_bf16.safetensors"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "QwenImage21Cache",
+   "pos": [
+    420,
+    60
+   ],
+   "size": [
+    340,
+    174
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "slot_index": 0,
+     "links": [
+      8
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "QwenImage21Cache"
+   },
+   "widgets_values": [
+    "auto",
+    "default"
+   ]
+  },
+  {
+   "id": 5,
+   "type": "LoadImage",
+   "pos": [
+    40,
+    780
+   ],
+   "size": [
+    340,
+    202
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "slot_index": 0,
+     "links": [
+      6
+     ]
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "slot_index": 1,
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "bild_hier_hochladen.png",
+    "image"
+   ],
+   "title": "Figur"
+  },
+  {
+   "id": 6,
+   "type": "PrimitiveStringMultiline",
+   "pos": [
+    780,
+    -260
+   ],
+   "size": [
+    700,
+    230
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "STRING",
+     "type": "STRING",
+     "slot_index": 0,
+     "links": [
+      2
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "PrimitiveStringMultiline"
+   },
+   "widgets_values": [
+    "Same character, friendly expression."
+   ],
+   "title": "Wuensche (optional)"
+  },
+  {
+   "id": 7,
+   "type": "StringConcatenate",
+   "pos": [
+    420,
+    300
+   ],
+   "size": [
+    340,
+    202
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 12,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "string_b",
+     "type": "STRING",
+     "link": 2,
+     "widget": {
+      "name": "string_b"
+     }
+    }
+   ],
+   "outputs": [
+    {
+     "name": "STRING",
+     "type": "STRING",
+     "slot_index": 0,
+     "links": [
+      3
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "StringConcatenate"
+   },
+   "widgets_values": [
+    "Create a head-and-shoulders portrait of the same character shown in <image1> for a round tabletop token. Keep the character's identity exactly the same: face, hair, skin, any distinctive features it has (such as ears, horns, scars or tattoos), outfit and colors. The face is centered in the middle of the square image, filling about half of it, facing the viewer, on a simple plain background; do not keep the background of <image1>.",
+    "",
+    " "
+   ]
+  },
+  {
+   "id": 8,
+   "type": "StringConcatenate",
+   "pos": [
+    800,
+    60
+   ],
+   "size": [
+    340,
+    202
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 14,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "string_a",
+     "type": "STRING",
+     "link": 3,
+     "widget": {
+      "name": "string_a"
+     }
+    }
+   ],
+   "outputs": [
+    {
+     "name": "STRING",
+     "type": "STRING",
+     "slot_index": 0,
+     "links": [
+      5
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "StringConcatenate"
+   },
+   "widgets_values": [
+    "",
+    "Official Dungeons & Dragons 5th edition rulebook art: a painterly digital fantasy illustration with crisp detailed rendering, visible brushwork, a vibrant colorful palette of contrasting jewel tones, mixed warm and cool light sources, expressive faces and rich costume details. Painted artwork, not a photograph.",
+    " "
+   ]
+  },
+  {
+   "id": 9,
+   "type": "TextEncodeQwenImage21",
+   "pos": [
+    1180,
+    60
+   ],
+   "size": [
+    340,
+    314
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 15,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 4
+    },
+    {
+     "name": "prompt",
+     "type": "STRING",
+     "link": 5,
+     "widget": {
+      "name": "prompt"
+     }
+    },
+    {
+     "name": "images.image_1",
+     "type": "IMAGE",
+     "link": 6
+    },
+    {
+     "name": "images.image_2",
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "slot_index": 0,
+     "links": [
+      9
+     ]
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "slot_index": 1,
+     "links": [
+      10
+     ]
+    },
+    {
+     "name": "latent",
+     "type": "LATENT",
+     "slot_index": 2,
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "TextEncodeQwenImage21"
+   },
+   "widgets_values": [
+    "",
+    "",
+    1024
+   ]
+  },
+  {
+   "id": 10,
+   "type": "CFGGuider",
+   "pos": [
+    1560,
+    60
+   ],
+   "size": [
+    340,
+    202
+   ],
+   "flags": {},
+   "order": 16,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 8
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 9
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 10
+    }
+   ],
+   "outputs": [
+    {
+     "name": "GUIDER",
+     "type": "GUIDER",
+     "slot_index": 0,
+     "links": [
+      12
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CFGGuider"
+   },
+   "widgets_values": [
+    1.0
+   ]
+  },
+  {
+   "id": 11,
+   "type": "KSamplerSelect",
+   "pos": [
+    40,
+    1020
+   ],
+   "size": [
+    340,
+    146
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "SAMPLER",
+     "type": "SAMPLER",
+     "slot_index": 0,
+     "links": [
+      13
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerSelect"
+   },
+   "widgets_values": [
+    "euler"
+   ]
+  },
+  {
+   "id": 12,
+   "type": "ManualSigmas",
+   "pos": [
+    40,
+    1260
+   ],
+   "size": [
+    340,
+    146
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "SIGMAS",
+     "type": "SIGMAS",
+     "slot_index": 0,
+     "links": [
+      14
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ManualSigmas"
+   },
+   "widgets_values": [
+    "1.0, 0.978453, 0.95418, 0.926626, 0.89508, 0.845148, 0.704534, 0.414568, 0"
+   ]
+  },
+  {
+   "id": 13,
+   "type": "RandomNoise",
+   "pos": [
+    40,
+    1500
+   ],
+   "size": [
+    340,
+    174
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "NOISE",
+     "type": "NOISE",
+     "slot_index": 0,
+     "links": [
+      11
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "RandomNoise"
+   },
+   "widgets_values": [
+    0,
+    "randomize"
+   ]
+  },
+  {
+   "id": 14,
+   "type": "EmptyLatentImage",
+   "pos": [
+    40,
+    1740
+   ],
+   "size": [
+    340,
+    202
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "slot_index": 0,
+     "links": [
+      15
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "EmptyLatentImage"
+   },
+   "widgets_values": [
+    1024,
+    1024,
+    1
+   ]
+  },
+  {
+   "id": 15,
+   "type": "SamplerCustomAdvanced",
+   "pos": [
+    1940,
+    60
+   ],
+   "size": [
+    340,
+    230
+   ],
+   "flags": {},
+   "order": 17,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "noise",
+     "type": "NOISE",
+     "link": 11
+    },
+    {
+     "name": "guider",
+     "type": "GUIDER",
+     "link": 12
+    },
+    {
+     "name": "sampler",
+     "type": "SAMPLER",
+     "link": 13
+    },
+    {
+     "name": "sigmas",
+     "type": "SIGMAS",
+     "link": 14
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 15
+    }
+   ],
+   "outputs": [
+    {
+     "name": "output",
+     "type": "LATENT",
+     "slot_index": 0,
+     "links": [
+      16
+     ]
+    },
+    {
+     "name": "denoised_output",
+     "type": "LATENT",
+     "slot_index": 1,
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SamplerCustomAdvanced"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 16,
+   "type": "VAEDecode",
+   "pos": [
+    2320,
+    60
+   ],
+   "size": [
+    340,
+    146
+   ],
+   "flags": {},
+   "order": 18,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 16
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 17
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "slot_index": 0,
+     "links": [
+      19
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 17,
+   "type": "LoadImage",
+   "pos": [
+    40,
+    1980
+   ],
+   "size": [
+    340,
+    202
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "slot_index": 0,
+     "links": [
+      20
+     ]
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "slot_index": 1,
+     "links": [
+      18
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "token_rahmen.png",
+    "image"
+   ],
+   "title": "Token-Rahmen"
+  },
+  {
+   "id": 18,
+   "type": "InvertMask",
+   "pos": [
+    420,
+    540
+   ],
+   "size": [
+    340,
+    118
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": 18
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "slot_index": 0,
+     "links": [
+      21
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "InvertMask"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 19,
+   "type": "ImageCompositeMasked",
+   "pos": [
+    2700,
+    60
+   ],
+   "size": [
+    340,
+    258
+   ],
+   "flags": {},
+   "order": 19,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "destination",
+     "type": "IMAGE",
+     "link": 19
+    },
+    {
+     "name": "source",
+     "type": "IMAGE",
+     "link": 20
+    },
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": 21
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "slot_index": 0,
+     "links": [
+      22
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageCompositeMasked"
+   },
+   "widgets_values": [
+    0,
+    0,
+    false
+   ]
+  },
+  {
+   "id": 20,
+   "type": "LoadImage",
+   "pos": [
+    40,
+    2220
+   ],
+   "size": [
+    340,
+    202
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "slot_index": 0,
+     "links": []
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "slot_index": 1,
+     "links": [
+      23
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "token_maske.png",
+    "image"
+   ],
+   "title": "Token-Maske"
+  },
+  {
+   "id": 21,
+   "type": "JoinImageWithAlpha",
+   "pos": [
+    3080,
+    60
+   ],
+   "size": [
+    340,
+    146
+   ],
+   "flags": {},
+   "order": 20,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 22
+    },
+    {
+     "name": "alpha",
+     "type": "MASK",
+     "link": 23
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "slot_index": 0,
+     "links": [
+      24
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "JoinImageWithAlpha"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 22,
+   "type": "SaveImage",
+   "pos": [
+    3460,
+    60
+   ],
+   "size": [
+    340,
+    146
+   ],
+   "flags": {},
+   "order": 21,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 24
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "slot_index": 0,
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "Gezeichnet/DnD_Token"
+   ]
+  },
+  {
+   "id": 23,
+   "type": "Note",
+   "pos": [
+    40,
+    -260
+   ],
+   "size": [
+    700,
+    230
+   ],
+   "flags": {},
+   "order": 22,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "D&D - TOKEN AUS BILD (Qwen-Image 2.1 Turbo + runder Rahmen)\n\n1. Im Knoten 'Figur' ein Bild der Figur laden (Foto, Zeichnung, eigenes D&D-Bild).\n2. Im Feld 'Wuensche' optional Aenderungen (z.B. 'angry expression, wearing a hood').\nDie Figur wird als Brustbild im D&D-Stil neu gemalt, rund ausgeschnitten, goldener Ring,\naussen transparent (PNG). Rahmen und Maske wie beim Token. 1024x1024, ~65 s."
+   ],
+   "title": "So geht's"
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   4,
+   0,
+   "MODEL"
+  ],
+  [
+   2,
+   6,
+   0,
+   7,
+   0,
+   "STRING"
+  ],
+  [
+   3,
+   7,
+   0,
+   8,
+   0,
+   "STRING"
+  ],
+  [
+   4,
+   2,
+   0,
+   9,
+   0,
+   "CLIP"
+  ],
+  [
+   5,
+   8,
+   0,
+   9,
+   1,
+   "STRING"
+  ],
+  [
+   6,
+   5,
+   0,
+   9,
+   2,
+   "IMAGE"
+  ],
+  [
+   7,
+   3,
+   0,
+   9,
+   4,
+   "VAE"
+  ],
+  [
+   8,
+   4,
+   0,
+   10,
+   0,
+   "MODEL"
+  ],
+  [
+   9,
+   9,
+   0,
+   10,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   10,
+   9,
+   1,
+   10,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   11,
+   13,
+   0,
+   15,
+   0,
+   "NOISE"
+  ],
+  [
+   12,
+   10,
+   0,
+   15,
+   1,
+   "GUIDER"
+  ],
+  [
+   13,
+   11,
+   0,
+   15,
+   2,
+   "SAMPLER"
+  ],
+  [
+   14,
+   12,
+   0,
+   15,
+   3,
+   "SIGMAS"
+  ],
+  [
+   15,
+   14,
+   0,
+   15,
+   4,
+   "LATENT"
+  ],
+  [
+   16,
+   15,
+   0,
+   16,
+   0,
+   "LATENT"
+  ],
+  [
+   17,
+   3,
+   0,
+   16,
+   1,
+   "VAE"
+  ],
+  [
+   18,
+   17,
+   1,
+   18,
+   0,
+   "MASK"
+  ],
+  [
+   19,
+   16,
+   0,
+   19,
+   0,
+   "IMAGE"
+  ],
+  [
+   20,
+   17,
+   0,
+   19,
+   1,
+   "IMAGE"
+  ],
+  [
+   21,
+   18,
+   0,
+   19,
+   2,
+   "MASK"
+  ],
+  [
+   22,
+   19,
+   0,
+   21,
+   0,
+   "IMAGE"
+  ],
+  [
+   23,
+   20,
+   1,
+   21,
+   1,
+   "MASK"
+  ],
+  [
+   24,
+   21,
+   0,
+   22,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.75,
+   "offset": [
+    0,
+    300
+   ]
+  }
+ },
+ "version": 0.4
+}

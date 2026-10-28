@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111214">
+<link rel="icon" href="/icon.svg">
+<link rel="stylesheet" href="/common.css">
+<title>Bilder – Verwaltung</title>
+<style>
+  .wrap { max-width:900px; margin:0 auto; padding:14px 16px calc(80px + env(safe-area-inset-bottom)); }
+  header { display:flex; align-items:center; justify-content:space-between; padding:6px 2px 14px; }
+  header h1 { margin:0; font-size:20px; }
+  .seg { display:grid; grid-template-columns:1fr 1fr; background:#141518; border:1px solid var(--line); border-radius:12px; padding:4px; margin-bottom:14px; }
+  .seg button { border:0; background:none; color:var(--muted); padding:11px 6px; border-radius:9px; font-size:15px; font-weight:600; cursor:pointer; }
+  .seg button.on { background:var(--card2); color:var(--text); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin-bottom:14px; }
+  .card h2 { margin:0 0 12px; font-size:16px; }
+
+  .user { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 0; border-top:1px solid var(--line); }
+  .user:first-child { border-top:0; padding-top:0; }
+  .user .n { flex:1 1 140px; }
+  .user .n b { display:block; }
+  .user .n span { font-size:13px; color:var(--muted); }
+  .tag { font-size:12px; border:1px solid var(--accent); color:var(--accent); border-radius:99px; padding:1px 8px; margin-left:6px; }
+  .newuser { display:grid; grid-template-columns:1fr; gap:0; }
+  .chk { display:flex; gap:8px; align-items:center; font-size:14px; color:var(--muted); margin:2px 0 6px; }
+  @media (min-width:640px) { .newuser { grid-template-columns:1fr 1fr; gap:0 10px; } .newuser .full { grid-column:1 / -1; } }
+
+  .toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:12px; }
+  .toolbar select { padding:9px 10px; border-radius:10px; border:1px solid var(--line); background:#121316; color:var(--text); font-size:14px; }
+  .toolbar .count { color:var(--muted); font-size:13px; margin-left:auto; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  @media (min-width:640px) { .grid { grid-template-columns:repeat(5,1fr); } }
+  .tile { position:relative; border-radius:8px; overflow:hidden; background:#0c0d0f; cursor:pointer; aspect-ratio:1; }
+  .tile img, .tile video { width:100%; height:100%; object-fit:cover; display:block; }
+  .tile .play { position:absolute; left:6px; top:6px; background:rgba(0,0,0,.65); color:#fff; border-radius:6px; font-size:11px; padding:2px 6px; }
+  .tile .o { position:absolute; left:0; right:0; bottom:0; padding:3px 6px; font-size:11px; background:linear-gradient(transparent, rgba(0,0,0,.8)); color:#ddd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tile.sel { outline:3px solid var(--accent); outline-offset:-3px; }
+  .tile .ck { position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:50%; border:2px solid #fff; background:rgba(0,0,0,.35); display:none; }
+  .selecting .tile .ck { display:block; }
+  .tile.sel .ck { background:var(--accent); border-color:var(--accent); }
+  .tile.lock .ck { display:none !important; }
+  .tile .lk { position:absolute; top:6px; left:6px; font-size:13px; background:rgba(0,0,0,.6); border-radius:6px; padding:1px 5px; }
+  .more { width:100%; margin-top:12px; }
+
+  .bar { position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:1px solid var(--line); padding:12px 16px calc(12px + env(safe-area-inset-bottom)); display:none; gap:10px; justify-content:center; z-index:5; }
+  .bar.show { display:flex; }
+  .lb { position:fixed; inset:0; background:#08090a; display:none; flex-direction:column; z-index:10; padding:16px; padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
+  .lb img, .lb video { flex:1; min-height:0; width:100%; object-fit:contain; }
+  .lb .info { color:var(--muted); font-size:13px; margin:10px auto 0; max-width:700px; text-align:center; }
+  .lb .acts { display:flex; gap:10px; justify-content:center; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Verwaltung</h1>
+    <a class="link" href="/">Zurück</a>
+  </header>
+  <div class="seg">
+    <button id="t-users" class="on">Benutzer</button>
+    <button id="t-images">Alle Bilder</button>
+  </div>
+
+  <section id="p-users">
+    <div class="card"><h2>Benutzer</h2><div id="users"></div></div>
+    <div class="card">
+      <h2>Neuer Benutzer</h2>
+      <form class="newuser" id="nf">
+        <input id="nu-name" type="text" autocapitalize="none" spellcheck="false" placeholder="Name" autocomplete="off">
+        <input id="nu-pw" type="password" placeholder="Passwort (mind. 8 Zeichen)" autocomplete="new-password">
+        <label class="chk full"><input id="nu-admin" type="checkbox"> Admin (darf Benutzer und alle Bilder verwalten)</label>
+        <label class="chk full"><input id="nu-nsfw" type="checkbox"> NSFW (sieht die Aktion-Auswahl für Videos und NSFW-Hinweise)</label>
+        <button class="primary full" type="submit">Anlegen</button>
+        <div class="err full" id="nu-err"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="p-images" style="display:none">
+    <div class="toolbar" id="tb">
+      <select id="kind"><option value="output">Erzeugte Bilder</option><option value="input">Eingabebilder / Importe</option></select>
+      <select id="owner"><option value="all">Alle Besitzer</option><option value="none">Ohne Besitzer (ComfyUI)</option></select>
+      <button class="btn" id="sel-toggle">Auswählen</button>
+      <button class="btn" id="dl-all">Alle herunterladen</button>
+      <button class="btn danger" id="del-all">Alle löschen</button>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="grid" id="grid"></div>
+    <button class="btn more" id="more" style="display:none">Mehr laden</button>
+  </section>
+</div>
+
+<div class="bar" id="bar">
+  <button class="btn" id="sel-all">Alle geladenen</button>
+  <button class="btn" id="sel-dl">Herunterladen (0)</button>
+  <button class="btn danger" id="sel-del">Löschen (0)</button>
+  <button class="btn" id="sel-cancel">Abbrechen</button>
+</div>
+
+<div class="lb" id="lb">
+  <img id="lb-img" alt="">
+  <video id="lb-vid" controls playsinline loop style="display:none"></video>
+  <div class="info" id="lb-info"></div>
+  <div class="acts">
+    <a class="btn" id="lb-save" download>Speichern</a>
+    <button class="btn danger" id="lb-del">Löschen</button>
+    <button class="btn" id="lb-close">Schließen</button>
+  </div>
+</div>
+
+<script src="/ui.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  if (r.status === 401) { location.replace('/?t=' + Date.now()); throw new Error('abgemeldet'); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.detail || ('Fehler ' + r.status));
+  return j;
+}
+const post = (path, body, method = 'POST') => api(path, {method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+const kind = () => $('kind').value;
+// v = Aenderungszeit der Datei: gleicher Name, neues Bild -> neue Adresse, kein alter Cache
+const imgUrl = (i, preview) => `/api/image?kind=${kind()}&filename=${encodeURIComponent(i.filename)}&subfolder=${encodeURIComponent(i.subfolder)}&v=${i.mtime || ''}${preview ? '&preview=1' : ''}`;
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const mb = b => b > 1e9 ? (b / 1e9).toFixed(1) + ' GB' : Math.round(b / 1e6) + ' MB';
+const key = i => i.subfolder + '/' + i.filename;
+
+// ---------------- Tabs
+function tab(t) {
+  $('t-users').classList.toggle('on', t === 'users'); $('t-images').classList.toggle('on', t === 'images');
+  $('p-users').style.display = t === 'users' ? '' : 'none'; $('p-images').style.display = t === 'images' ? '' : 'none';
+  if (t === 'images' && !loaded) loadImages(true);
+  if (t !== 'images') endSelect();
+  try { sessionStorage.setItem('ig.admintab', t); } catch {}
+}
+$('t-users').onclick = () => tab('users');
+$('t-images').onclick = () => tab('images');
+
+// ---------------- Benutzer
+let userList = [];
+async function loadUsers() {
+  userList = await api('/api/users');
+  $('users').innerHTML = userList.map(u => `
+    <div class="user">
+      <div class="n"><b>${esc(u.name)}${u.admin ? '<span class="tag">Admin</span>' : ''}${u.nsfw ? '<span class="tag">NSFW</span>' : ''}${u.me ? ' <span style="color:var(--muted);font-weight:400">(du)</span>' : ''}</b>
+        <span>${plural(u.images, 'Bild', 'Bilder')} · seit ${new Date(u.created * 1000).toLocaleDateString('de-DE')}</span></div>
+      <button class="btn" data-a="pw" data-id="${u.id}">Passwort</button>
+      <button class="btn" data-a="nsfw" data-id="${u.id}">${u.nsfw ? 'NSFW sperren' : 'NSFW freigeben'}</button>
+      ${u.me ? '' : `<button class="btn" data-a="admin" data-id="${u.id}">${u.admin ? 'Admin entziehen' : 'Zum Admin'}</button>
+      <button class="btn danger" data-a="del" data-id="${u.id}">Löschen</button>`}
+    </div>`).join('');
+  $('users').querySelectorAll('button').forEach(b => b.onclick = () => userAction(b.dataset.a, +b.dataset.id));
+  const sel = $('owner'), cur = sel.value;
+  sel.innerHTML = '<option value="all">Alle Besitzer</option><option value="none">Ohne Besitzer (ComfyUI)</option>' +
+    userList.map(u => `<option value="${u.id}">${esc(u.name)}</option>`).join('');
+  sel.value = [...sel.options].some(o => o.value === cur) ? cur : 'all';
+}
+async function userAction(a, id) {
+  const u = userList.find(x => x.id === id);
+  try {
+    if (a === 'pw') {
+      const v = await askDialog({title: `Passwort für ${u.name}`, ok: 'Setzen',
+        text: u.me ? 'Deine anderen Geräte werden abgemeldet.' : `${u.name} wird auf allen Geräten abgemeldet.`,
+        fields: [{name: 'pw', label: 'Neues Passwort', type: 'password', minlength: 8},
+                 {name: 'pw2', label: 'Wiederholen', type: 'password'}],
+        check: v => v.pw !== v.pw2 ? 'Die Passwörter stimmen nicht überein' : null});
+      if (!v) return;
+      await post('/api/users/' + id, {password: v.pw}, 'PATCH'); toast('Passwort gesetzt');
+    } else if (a === 'nsfw') {
+      await post('/api/users/' + id, {nsfw: !u.nsfw}, 'PATCH');
+    } else if (a === 'admin') {
+      await post('/api/users/' + id, {admin: !u.admin}, 'PATCH');
+    } else if (a === 'del') {
+      if (!await askDialog({title: `Benutzer ${u.name} löschen?`, ok: 'Löschen', danger: true,
+                            text: 'Seine Bilder bleiben erhalten (dann ohne Besitzer).'})) return;
+      await api('/api/users/' + id, {method:'DELETE'});
+      toast(`${u.name} gelöscht`);
+    }
+    loadUsers();
+  } catch (e) { toast(e.message, true); }
+}
+$('nf').addEventListener('submit', async e => {
+  e.preventDefault(); $('nu-err').textContent = '';
+  try {
+    await post('/api/users', {name: $('nu-name').value.trim(), password: $('nu-pw').value, admin: $('nu-admin').checked,
+                          nsfw: $('nu-nsfw').checked});
+    toast(`Benutzer ${$('nu-name').value.trim()} angelegt`);
+    $('nu-name').value = ''; $('nu-pw').value = ''; $('nu-admin').checked = false; $('nu-nsfw').checked = false;
+    loadUsers();
+  } catch (err) { $('nu-err').textContent = err.message; }
+});
+
+// ---------------- Bilder
+let items = [], total = 0, loaded = false, selecting = false;
+const selected = new Set();
+const PAGE = 60;
+async function loadImages(reset) {
+  if (reset) { items = []; $('grid').innerHTML = ''; }
+  $('owner').style.display = kind() === 'output' ? '' : 'none';
+  let j;
+  try { j = await api(`/api/admin/images?kind=${kind()}&owner=${encodeURIComponent($('owner').value)}&limit=${PAGE}&offset=${items.length}`); }
+  catch (e) { toast('Bilder: ' + e.message, true); return; }
+  loaded = true; total = j.total; totalSize = j.size;
+  j.items.forEach(i => { items.push(i); $('grid').appendChild(tile(i)); });
+  showCount();
+  $('more').style.display = items.length < total ? '' : 'none';
+  $('more').textContent = `Mehr laden (${total - items.length} weitere)`;
+}
+let totalSize = 0;
+function showCount() { $('count').textContent = `${plural(total, 'Bild', 'Bilder')} · ${mb(totalSize)}`; $('del-all').disabled = !total; $('dl-all').disabled = !total; }
+function label(i) {
+  if (kind() === 'input') return (i.subfolder ? i.subfolder + '/' : '') + i.filename;
+  return `${i.owner || (i.owner_id ? 'gelöschter Benutzer' : 'ComfyUI')} · ${i.subfolder || '/'}`;
+}
+function tile(i) {
+  const d = document.createElement('div');
+  d.className = 'tile' + (i.protected ? ' lock' : ''); d.dataset.k = key(i);
+  d.innerHTML = `<div class="ck"></div>
+    ${i.protected ? '<div class="lk" title="Vorgabe eines Workflows, wird nicht gelöscht">🔒</div>' : ''}
+    <div class="o">${esc(label(i))}</div>`;
+  mediaThumb(d, i, imgUrl(i), imgUrl(i, true));
+  d.onclick = () => selecting ? (i.protected || toggle(i, d)) : openLb(i);
+  return d;
+}
+function toggle(i, d) {
+  const k = key(i);
+  selected.has(k) ? selected.delete(k) : selected.add(k);
+  d.classList.toggle('sel', selected.has(k));
+  $('sel-del').textContent = `Löschen (${selected.size})`;
+  $('sel-dl').textContent = `Herunterladen (${selected.size})`;
+}
+function startSelect() { selecting = true; document.body.classList.add('selecting'); $('bar').classList.add('show'); $('sel-toggle').textContent = 'Auswahl beenden'; }
+function endSelect() {
+  selecting = false; selected.clear(); document.body.classList.remove('selecting'); $('bar').classList.remove('show');
+  $('sel-toggle').textContent = 'Auswählen'; $('sel-del').textContent = 'Löschen (0)'; $('sel-dl').textContent = 'Herunterladen (0)';
+  document.querySelectorAll('.tile.sel').forEach(t => t.classList.remove('sel'));
+}
+async function del(list) {
+  if (!list.length) return;
+  if (!await askDialog({title: list.length > 1 ? `${list.length} Bilder löschen?` : 'Bild löschen?', ok: 'Löschen', danger: true,
+                        text: 'Endgültig - das lässt sich nicht rückgängig machen.'})) return;
+  try {
+    const j = await post('/api/admin/delete', {kind: kind(), items: list.map(i => ({subfolder: i.subfolder, filename: i.filename}))});
+    const gone = new Set(list.filter(i => !i.protected).map(key));
+    items = items.filter(i => !gone.has(key(i))); total -= j.deleted;
+    totalSize -= list.filter(i => gone.has(key(i))).reduce((a, i) => a + i.size, 0);
+    document.querySelectorAll('.tile').forEach(t => { if (gone.has(t.dataset.k)) t.remove(); });
+    showCount();
+    endSelect(); lb.close();
+    toast(`${j.deleted} gelöscht`);
+    if (kind() === 'output') loadUsers();
+  } catch (e) { toast(e.message, true); }
+}
+async function delAll() {
+  const what = kind() === 'input' ? 'Eingabebilder / Importe'
+    : ($('owner').value === 'all' ? 'erzeugten Bilder' : `Bilder von „${$('owner').selectedOptions[0].textContent}“`);
+  const n = total - items.filter(i => i.protected).length;
+  const v = await askDialog({title: `Alle ${what} löschen?`, ok: 'Alles löschen', danger: true,
+    text: `${plural(n, 'Datei', 'Dateien')}, ${mb(totalSize)}. Endgültig - das lässt sich nicht rückgängig machen.` +
+          (kind() === 'input' ? ' Workflow-Vorgaben (🔒) bleiben.' : ''),
+    fields: [{name: 'c', label: 'Zum Bestätigen LÖSCHEN eintippen'}],
+    check: v => v.c.trim().toUpperCase() !== 'LÖSCHEN' ? 'Bitte genau LÖSCHEN eintippen' : null});
+  if (!v) return;
+  try {
+    const j = await post('/api/admin/delete', {kind: kind(), all: true, owner: $('owner').value, confirm: 'LÖSCHEN'});
+    toast(`${plural(j.deleted, 'Datei', 'Dateien')} gelöscht${j.skipped ? `, ${j.skipped} geschützte übersprungen` : ''}`);
+    endSelect(); loadImages(true);
+    if (kind() === 'output') loadUsers();
+  } catch (e) { toast(e.message, true); }
+}
+function openLb(i) {
+  showMedia($('lb-img'), $('lb-vid'), i, imgUrl(i));
+  $('lb-save').href = imgUrl(i); $('lb-save').setAttribute('download', i.filename);
+  $('lb-info').textContent = kind() === 'input'
+    ? [label(i), new Date(i.mtime * 1000).toLocaleString('de-DE'), i.protected ? 'Vorgabe eines Workflows (geschützt)' : ''].filter(Boolean).join(' · ')
+    : [i.owner || (i.owner_id ? 'gelöschter Benutzer' : 'direkt in ComfyUI'), i.workflow,
+       new Date(i.mtime * 1000).toLocaleString('de-DE'), i.prompt].filter(Boolean).join(' · ');
+  $('lb-del').style.display = i.protected ? 'none' : '';
+  $('lb-del').onclick = () => del([i]);
+  lb.open();
+}
+$('kind').onchange = () => { endSelect(); loadImages(true); };
+$('owner').onchange = () => { endSelect(); loadImages(true); };
+$('more').onclick = () => loadImages(false);
+// automatisch nachladen, sobald "Mehr laden" in Sichtweite kommt
+let imgBusy = false;
+new IntersectionObserver(async es => {
+  if (!es[0].isIntersecting || imgBusy || !loaded || items.length >= total) return;
+  imgBusy = true; try { await loadImages(false); } finally { imgBusy = false; }
+}, {rootMargin: '600px'}).observe($('more'));
+$('sel-toggle').onclick = () => selecting ? endSelect() : startSelect();
+$('del-all').onclick = delAll;
+$('dl-all').onclick = () => {
+  if (!total) return toast('Keine Bilder', true);
+  downloadZip(`/api/admin/zip?kind=${kind()}&owner=${encodeURIComponent($('owner').value)}`, null,
+              `ZIP mit ${plural(total, 'Bild', 'Bildern')} (${mb(totalSize)}) wird erstellt …`);
+};
+$('sel-dl').onclick = async () => {
+  const list = items.filter(i => selected.has(key(i)));
+  if (!list.length) return toast('Nichts ausgewählt', true);
+  await downloadZip('/api/admin/zip', {kind: kind(), items: list.map(i => ({subfolder: i.subfolder, filename: i.filename}))});
+  endSelect();
+};
+$('sel-cancel').onclick = endSelect;
+$('sel-all').onclick = () => {
+  items.forEach(i => { if (!i.protected) selected.add(key(i)); });
+  document.querySelectorAll('.tile:not(.lock)').forEach(t => t.classList.add('sel'));
+  $('sel-del').textContent = `Löschen (${selected.size})`;
+  $('sel-dl').textContent = `Herunterladen (${selected.size})`;
+};
+$('sel-del').onclick = () => del(items.filter(i => selected.has(key(i))));
+$('lb-close').onclick = () => lb.close();
+$('lb').onclick = e => { if (e.target === $('lb') || e.target === $('lb-img')) lb.close(); };
+
+const lb = lightbox($('lb'));
+loadUsers().catch(e => toast(e.message, true));
+let t0 = 'users'; try { t0 = sessionStorage.getItem('ig.admintab') || 'users'; } catch {}
+tab(t0);
+</script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+{
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "qwen_image_2.1_turbo_bf16.safetensors",
+   "weight_dtype": "default"
+  },
+  "_meta": {
+   "title": "UNETLoader"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "qwen3vl_8b_bf16.safetensors",
+   "type": "qwen_image",
+   "device": "default"
+  },
+  "_meta": {
+   "title": "CLIPLoader"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "qwen_image_2.1_vae_bf16.safetensors"
+  },
+  "_meta": {
+   "title": "VAELoader"
+  }
+ },
+ "4": {
+  "class_type": "QwenImage21Cache",
+  "inputs": {
+   "model": [
+    "1",
+    0
+   ],
+   "device": "auto",
+   "dtype": "default"
+  },
+  "_meta": {
+   "title": "QwenImage21Cache"
+  }
+ },
+ "6": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "bild_hier_hochladen.png"
+  },
+  "_meta": {
+   "title": "Figur"
+  }
+ },
+ "10": {
+  "class_type": "PrimitiveStringMultiline",
+  "inputs": {
+   "value": "Same character, friendly expression."
+  },
+  "_meta": {
+   "title": "Wuensche (optional)"
+  }
+ },
+ "11": {
+  "class_type": "StringConcatenate",
+  "inputs": {
+   "string_a": "Create a head-and-shoulders portrait of the same character shown in <image1> for a round tabletop token. Keep the character's identity exactly the same: face, hair, skin, any distinctive features it has (such as ears, horns, scars or tattoos), outfit and colors. The face is centered in the middle of the square image, filling about half of it, facing the viewer, on a simple plain background; do not keep the background of <image1>.",
+   "string_b": [
+    "10",
+    0
+   ],
+   "delimiter": " "
+  },
+  "_meta": {
+   "title": "StringConcatenate"
+  }
+ },
+ "13": {
+  "class_type": "StringConcatenate",
+  "inputs": {
+   "string_a": [
+    "11",
+    0
+   ],
+   "string_b": "Official Dungeons & Dragons 5th edition rulebook art: a painterly digital fantasy illustration with crisp detailed rendering, visible brushwork, a vibrant colorful palette of contrasting jewel tones, mixed warm and cool light sources, expressive faces and rich costume details. Painted artwork, not a photograph.",
+   "delimiter": " "
+  },
+  "_meta": {
+   "title": "StringConcatenate"
+  }
+ },
+ "12": {
+  "class_type": "TextEncodeQwenImage21",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "prompt": [
+    "13",
+    0
+   ],
+   "negative_prompt": "",
+   "resolution": 1024,
+   "images.image_1": [
+    "6",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "TextEncodeQwenImage21"
+  }
+ },
+ "14": {
+  "class_type": "CFGGuider",
+  "inputs": {
+   "model": [
+    "4",
+    0
+   ],
+   "positive": [
+    "12",
+    0
+   ],
+   "negative": [
+    "12",
+    1
+   ],
+   "cfg": 1.0
+  },
+  "_meta": {
+   "title": "CFGGuider"
+  }
+ },
+ "15": {
+  "class_type": "KSamplerSelect",
+  "inputs": {
+   "sampler_name": "euler"
+  },
+  "_meta": {
+   "title": "KSamplerSelect"
+  }
+ },
+ "16": {
+  "class_type": "ManualSigmas",
+  "inputs": {
+   "sigmas": "1.0, 0.978453, 0.95418, 0.926626, 0.89508, 0.845148, 0.704534, 0.414568, 0"
+  },
+  "_meta": {
+   "title": "ManualSigmas"
+  }
+ },
+ "17": {
+  "class_type": "RandomNoise",
+  "inputs": {
+   "noise_seed": 0
+  },
+  "_meta": {
+   "title": "RandomNoise"
+  }
+ },
+ "20": {
+  "class_type": "EmptyLatentImage",
+  "inputs": {
+   "width": 1024,
+   "height": 1024,
+   "batch_size": 1
+  },
+  "_meta": {
+   "title": "EmptyLatentImage"
+  }
+ },
+ "30": {
+  "class_type": "SamplerCustomAdvanced",
+  "inputs": {
+   "noise": [
+    "17",
+    0
+   ],
+   "guider": [
+    "14",
+    0
+   ],
+   "sampler": [
+    "15",
+    0
+   ],
+   "sigmas": [
+    "16",
+    0
+   ],
+   "latent_image": [
+    "20",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "SamplerCustomAdvanced"
+  }
+ },
+ "40": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "30",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "VAEDecode"
+  }
+ },
+ "70": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "token_rahmen.png"
+  },
+  "_meta": {
+   "title": "Token-Rahmen"
+  }
+ },
+ "71": {
+  "class_type": "InvertMask",
+  "inputs": {
+   "mask": [
+    "70",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "InvertMask"
+  }
+ },
+ "72": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "destination": [
+    "40",
+    0
+   ],
+   "source": [
+    "70",
+    0
+   ],
+   "x": 0,
+   "y": 0,
+   "resize_source": false,
+   "mask": [
+    "71",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "ImageCompositeMasked"
+  }
+ },
+ "73": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "token_maske.png"
+  },
+  "_meta": {
+   "title": "Token-Maske"
+  }
+ },
+ "74": {
+  "class_type": "JoinImageWithAlpha",
+  "inputs": {
+   "image": [
+    "72",
+    0
+   ],
+   "alpha": [
+    "73",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "JoinImageWithAlpha"
+  }
+ },
+ "50": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "images": [
+    "74",
+    0
+   ],
+   "filename_prefix": "Gezeichnet/DnD_Token"
+  },
+  "_meta": {
+   "title": "SaveImage"
+  }
+ }
+}

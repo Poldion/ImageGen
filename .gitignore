@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Eigene Workflow-Erweiterungen bleiben privat
+workflows/extras/*
+!workflows/extras/README.md
+
+# Laufzeitdaten, falls testweise im Repo gestartet
+data/
+*.env
+!imagegen.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Interne Arbeitslisten
+VERBESSERUNGEN*.md

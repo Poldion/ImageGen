@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111214">
+<link rel="icon" href="/icon.svg">
+<link rel="stylesheet" href="/common.css">
+<title>Bilder – Einrichtung</title>
+</head>
+<body>
+<div class="center">
+  <form class="box" id="f">
+    <h1>Einrichtung</h1>
+    <p>Lege den Admin an. Er kann danach weitere Benutzer anlegen und alle Bilder verwalten.</p>
+    <input id="name" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Name (z.B. pold)" autofocus>
+    <input id="pw" type="password" autocomplete="new-password" placeholder="Passwort (mind. 8 Zeichen)">
+    <input id="pw2" type="password" autocomplete="new-password" placeholder="Passwort wiederholen">
+    <button class="primary" type="submit" id="go">Admin anlegen</button>
+    <div class="err" id="err"></div>
+  </form>
+</div>
+<script>
+document.getElementById('f').addEventListener('submit', async e => {
+  e.preventDefault();
+  const v = id => document.getElementById(id).value;
+  const err = document.getElementById('err'), go = document.getElementById('go');
+  err.textContent = '';
+  if (v('pw') !== v('pw2')) { err.textContent = 'Die Passwörter stimmen nicht überein'; return; }
+  go.disabled = true;
+  try {
+    const r = await fetch('/api/setup', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name: v('name'), password: v('pw')})});
+    if (r.ok || r.status === 409) { location.replace('/?t=' + Date.now()); return; }
+    err.textContent = (await r.json().catch(() => ({}))).detail || 'Fehler';
+  } catch { err.textContent = 'Server nicht erreichbar'; }
+  go.disabled = false;
+});
+</script>
+</body>
+</html>

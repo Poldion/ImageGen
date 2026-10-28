@@ -1,0 +1,95 @@
+# ImageGen: ComfyUI (AMD-GPU, getestet auf Ryzen AI Max "Strix Halo") + Web-App.
+#
+# Daten liegen ausserhalb des Repos unter IMAGEGEN_DATA (Default ~/imagegen):
+#   models/       ComfyUI-Ordnerlayout (checkpoints, diffusion_models, loras, vae, ...)
+#   output/       fertige Bilder
+#   input/        Eingabebilder
+#   custom_nodes/ ComfyUI-Erweiterungen (die eigenen aus comfyui/custom_nodes kopiert der Container
+#                 beim Start hinein; weitere nur aus vertrauenswuerdigen Quellen!)
+#   extras/       eigene Workflow-Erweiterungen (*.py, siehe workflows/extras/README.md)
+#   comfy-user/   ComfyUI-Einstellungen und Workflows (default/workflows/)
+#   cache/        MIOpen-/Triton-Kernel-Caches (beschleunigen den 2. Start)
+#
+# Starten (aus diesem Ordner):
+#   docker compose --env-file ~/imagegen/imagegen.env up -d --build
+#
+# Vorlage fuer imagegen.env: imagegen.env.example
+# Mit dem OllamaProxy: die Web-App meldet sich dort als Modul (Speicheranzeige, Freigabe nach Leerlauf).
+
+name: imagegen
+
+services:
+  comfyui:
+    build:
+      context: ./comfyui
+      args:
+        COMFYUI_VERSION: ${COMFYUI_VERSION:-v0.42.1}
+    image: imagegen-comfyui:local
+    container_name: comfyui
+    restart: unless-stopped
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    # GPU-Zugriff als normaler User: Gruppen video/render des Hosts (numerische GIDs)
+    group_add:
+      - "${VIDEO_GID:-44}"
+      - "${RENDER_GID:-992}"
+    user: "${PUID:-1000}:${PGID:-1000}"
+    shm_size: 8g
+    environment:
+      # schnellere Attention (Flash/Mem-efficient SDPA) auf gfx1151
+      TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL: "1"
+      # MIOpen sucht sonst bei jeder neuen Eingabegroesse den besten Faltungs-Kernel aus:
+      # Conv3d im Vision-Teil von Qwen3-VL (Bild bearbeiten) kostete so ~135 s pro Bild
+      MIOPEN_FIND_MODE: "FAST"
+      # rocBLAS statt hipBLASLt: hipBLASLt nimmt auf gfx1151 fuer fp32 einen Notfall-Kernel
+      # (~1 TFLOPS) -> Vision-Encoder von Qwen3-VL (fp32) brauchte 100-140 s pro Bild.
+      # Gemessen (2026-10-21): fp32 2,7x, bf16/fp16 ~30 % schneller; Bearbeiten 180 -> 70 s,
+      # Qwen 2.1 38 -> 31 s, Anima unveraendert
+      TORCH_BLAS_PREFER_HIPBLASLT: "0"
+    volumes:
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/models:/opt/ComfyUI/models
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/output:/opt/ComfyUI/output
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/input:/opt/ComfyUI/input
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/custom_nodes:/opt/ComfyUI/custom_nodes
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/comfy-user:/opt/ComfyUI/user
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/cache:/cache
+    ports:
+      # ComfyUI-Web-UI und API im LAN. Ohne Login!
+      - "${COMFYUI_BIND:-0.0.0.0}:${COMFYUI_PORT:-8188}:8188"
+
+  # Schlanke Oberflaeche (Erzeugen/Bearbeiten, Workflow, Prompt, Groesse) mit Login.
+  # Fuer den Zugriff von aussen gedacht - davor gehoert ein Reverse-Proxy mit HTTPS.
+  webapp:
+    build:
+      context: .
+      dockerfile: webapp/Dockerfile
+    image: imagegen-webapp:local
+    container_name: imagegen-webapp
+    restart: unless-stopped
+    user: "${PUID:-1000}:${PGID:-1000}"
+    depends_on:
+      - comfyui
+    environment:
+      COMFYUI_URL: http://comfyui:8188
+      # Reverse-Proxys, deren X-Forwarded-For geglaubt wird (leer = Default: private Netze)
+      # "Ausformulieren": Sprachmodell ueber den Ollama-Proxy (erzwingt Kontext/keep_alive -> kein Neuladen).
+      # Leer = Knopf aus. Modell leer = Standardmodell des Proxys.
+      # z.B. http://192.168.1.20:11435 (OllamaProxy) oder http://host.docker.internal:11434 (Ollama)
+      WEBAPP_LLM_URL: ${WEBAPP_LLM_URL:-}
+      WEBAPP_LLM_MODEL: ${WEBAPP_LLM_MODEL:-}
+      # Modul fuer den OllamaProxy: Link zu ComfyUI in dessen Oberflaeche, Freigabe nach Leerlauf (Minuten)
+      WEBAPP_COMFYUI_LINK_PORT: ${COMFYUI_PORT:-8188}
+      WEBAPP_IDLE_FREE_MINUTES: ${WEBAPP_IDLE_FREE_MINUTES:-2}
+      WEBAPP_MODULE_TOKEN: ${WEBAPP_MODULE_TOKEN:-}
+      WEBAPP_TRUSTED_PROXIES: ${WEBAPP_TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1/128}
+    volumes:
+      # eigene Workflow-Erweiterungen (*.py); die Workflows baut die App beim Start daraus + aus ihrem Code
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/extras:/extras:ro
+      # Benutzer, Sitzungen, Bild-Zuordnung (SQLite). Erster Aufruf = Einrichtung des Admins
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/webapp-data:/data
+      # ComfyUI-Ausgaben und Eingabebilder (Uploads, Importe): Admin sieht und loescht hier
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/output:/output
+      - ${IMAGEGEN_DATA:-${HOME}/imagegen}/input:/input
+    ports:
+      - "${WEBAPP_BIND:-0.0.0.0}:${WEBAPP_PORT:-8190}:8190"

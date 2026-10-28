@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111214">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg">
+<link rel="stylesheet" href="/common.css">
+<title>Bilder – Anmelden</title>
+</head>
+<body>
+<div class="center">
+  <form class="box" id="f">
+    <h1>Bilder</h1>
+    <p>Bitte anmelden.</p>
+    <input id="name" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Name" autofocus>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="Passwort">
+    <button class="primary" type="submit" id="go">Anmelden</button>
+    <div class="err" id="err"></div>
+  </form>
+</div>
+<script>
+document.getElementById('f').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = document.getElementById('err'), go = document.getElementById('go');
+  err.textContent = ''; go.disabled = true;
+  try {
+    const r = await fetch('/api/login', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name: document.getElementById('name').value, password: document.getElementById('pw').value})});
+    if (r.ok) { location.replace(location.pathname + '?t=' + Date.now()); return; }
+    err.textContent = (await r.json().catch(() => ({}))).detail || 'Anmeldung fehlgeschlagen';
+  } catch { err.textContent = 'Server nicht erreichbar'; }
+  go.disabled = false;
+});
+</script>
+</body>
+</html>

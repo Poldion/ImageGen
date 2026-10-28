@@ -1,0 +1,18 @@
+name: CI
+
+# Tests der Web-App im Web-App-Image gegen ein nachgebautes ComfyUI (webapp/run_tests.sh).
+# Das ComfyUI-Image (rocm/pytorch, viele GB) wird hier nicht gebaut: zu groß für die GitHub-Runner.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  webapp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build workflows without ComfyUI
+        run: python3 workflows/build_workflows.py --api-only /tmp/wf
+      - name: Web app tests
+        run: bash webapp/run_tests.sh
